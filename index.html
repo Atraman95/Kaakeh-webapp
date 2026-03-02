@@ -794,15 +794,14 @@
     /* ── ITEM ROWS (order form) ── */
     #items-container { display: flex; flex-direction: column; gap: 7px; margin-bottom: 8px; }
     .item-form-row { display: flex; gap: 6px; align-items: center; }
-    .item-form-row input {
+    .item-form-row input, .item-form-row select {
       padding: 8px 9px; border: 1.5px solid var(--border); border-radius: var(--radius-sm);
       font-size: .835rem; color: var(--text); background: #fff;
       outline: none; font-family: inherit; transition: border-color .15s; min-width: 0;
     }
-    .item-form-row input:focus { border-color: var(--gold); }
-    .inp-name  { flex: 3; }
+    .item-form-row input:focus, .item-form-row select:focus { border-color: var(--gold); }
+    .inp-sku   { flex: 3; }
     .inp-qty   { flex: 1; }
-    .inp-price { flex: 1.5; }
     .rm-item { background: none; border: none; color: #e08080; font-size: 1rem; cursor: pointer; padding: 4px 6px; border-radius: 5px; flex-shrink: 0; transition: background .1s; }
     .rm-item:hover { background: #ffebee; }
     .add-item-btn { width: 100%; padding: 8px; background: var(--surface-2); border: 1.5px dashed var(--gold); border-radius: var(--radius-sm); color: var(--primary); font-size: .83rem; font-weight: 700; cursor: pointer; transition: background .15s; }
@@ -927,9 +926,8 @@
     @media (max-width: 440px) {
       .form-row { flex-direction: column; gap: 8px; }
       .item-form-row { flex-wrap: wrap; }
-      .inp-name  { flex: 1 1 100%; }
+      .inp-sku   { flex: 1 1 100%; }
       .inp-qty   { flex: 1 1 44%; }
-      .inp-price { flex: 1 1 44%; }
       .card-actions { gap: 5px; }
       .status-mini { max-width: 100px; }
     }
@@ -1269,9 +1267,8 @@
       <div class="form-section">
         <div class="section-label">Items Ordered</div>
         <div class="item-form-row" style="padding:0 0 4px;gap:6px;">
-          <span style="flex:3;font-size:.72rem;color:var(--text-muted);font-weight:600;">ITEM NAME</span>
+          <span style="flex:3;font-size:.72rem;color:var(--text-muted);font-weight:600;">ITEM</span>
           <span style="flex:1;font-size:.72rem;color:var(--text-muted);font-weight:600;">QTY</span>
-          <span style="flex:1.5;font-size:.72rem;color:var(--text-muted);font-weight:600;">UNIT PRICE</span>
           <span style="width:28px;"></span>
         </div>
         <div id="items-container"></div>
@@ -1283,6 +1280,13 @@
         <div class="form-row">
           <div class="fg"><label>Delivery Date *</label><input type="date" id="f-date"></div>
           <div class="fg"><label>Delivery Time</label><input type="time" id="f-time"></div>
+          <div class="fg">
+            <label>Delivery</label>
+            <select id="f-delivery" onchange="refreshTotal()">
+              <option value="no">No</option>
+              <option value="yes">Yes</option>
+            </select>
+          </div>
         </div>
         <div class="form-row">
           <div class="fg">
@@ -1347,6 +1351,13 @@
           <div class="form-row">
             <div class="fg"><label>Phone (optional)</label><input type="tel" id="imp-phone" placeholder="555-1234"></div>
             <div class="fg"><label>Delivery Time (optional)</label><input type="time" id="imp-time"></div>
+            <div class="fg">
+              <label>Delivery</label>
+              <select id="imp-delivery">
+                <option value="no">No</option>
+                <option value="yes">Yes</option>
+              </select>
+            </div>
           </div>
           <div class="form-row">
             <div class="fg"><label>Delivery Address (optional)</label><input type="text" id="imp-address" placeholder="Street, City"></div>
@@ -1421,9 +1432,8 @@
       <div class="sheet-section">
         <div class="sheet-section-label">Items Ordered</div>
         <div class="item-form-row" style="padding:0 0 4px;gap:6px;">
-          <span style="flex:3;font-size:.72rem;color:var(--text-muted);font-weight:600;">ITEM NAME</span>
+          <span style="flex:3;font-size:.72rem;color:var(--text-muted);font-weight:600;">ITEM</span>
           <span style="flex:1;font-size:.72rem;color:var(--text-muted);font-weight:600;">QTY</span>
-          <span style="flex:1.5;font-size:.72rem;color:var(--text-muted);font-weight:600;">UNIT PRICE</span>
           <span style="width:28px;"></span>
         </div>
         <div id="fab-items-container"></div>
@@ -1437,6 +1447,13 @@
         <div class="form-row">
           <div class="fg"><label>Delivery Date *</label><input type="date" id="fab-date"></div>
           <div class="fg"><label>Delivery Time</label><input type="time" id="fab-time"></div>
+          <div class="fg">
+            <label>Delivery</label>
+            <select id="fab-delivery" onchange="fabRefreshTotal()">
+              <option value="no">No</option>
+              <option value="yes">Yes</option>
+            </select>
+          </div>
         </div>
         <div class="form-row">
           <div class="fg">
@@ -1492,6 +1509,9 @@ let parsedImport = null;
 let filterDate    = 'all';   // 'today' | 'all'   (All Orders tab date toggle)
 let filterStatus  = 'all';   // 'all' | 'new' | 'in-progress' | 'ready' | 'delivered'
 let filterPayment = 'all';   // 'all' | 'paid' | 'unpaid'
+let skus          = [];
+const skusById    = {};
+const DELIVERY_SKU_ID = '76f384c5-d815-4d14-90ce-ea3dfbaf5bec';
 
 // ── ASYNC BUTTON STATE UTILITY ──
 // state: 'loading' | 'success' | 'idle'
@@ -1532,9 +1552,10 @@ function dbToOrder(row, itemRows) {
     statedTotal:    row.stated_total    ? parseFloat(row.stated_total)    : null,
     rawMessageText: row.raw_message_text || '',
     items: itemRows.map(i => ({
-      name:      i.name,
-      quantity:  i.quantity,
-      unitPrice: i.unit_price,
+      name:      i.product_name || i.name || '',
+      quantity:  i.qty ?? i.quantity ?? 0,
+      unitPrice: i.unit_price ?? 0,
+      sku_id:    i.sku_id || '',
     })),
   };
 }
@@ -1571,37 +1592,72 @@ async function loadOrders() {
   render();
 }
 
+async function loadSkus() {
+  const { data, error } = await db
+    .from('skus')
+    .select('id,name,category,price,pricing_type,base_quantity,active')
+    .eq('active', true)
+    .order('name', { ascending: true });
+  if (error) {
+    console.error('SKU load error:', error);
+    return;
+  }
+  skus = data || [];
+  Object.keys(skusById).forEach(k => delete skusById[k]);
+  skus.forEach(s => { skusById[s.id] = s; });
+}
+
 // ══════════════════════════════════════════════
 //  MUTATIONS
 // ══════════════════════════════════════════════
 async function _upsertOrder(data, existingId) {
-  const id  = existingId || uid();
-  const row = {
-    id,
-    customer_name:  data.customerName,
-    phone:          data.phone         || '',
-    address:        data.address       || '',
-    delivery_date:  data.deliveryDate,
-    delivery_time:  data.deliveryTime  || '',
-    order_status:   data.orderStatus,
-    payment_status: data.paymentStatus,
-  };
-  if (!existingId) row.created_at = Date.now();
-
-  const { error: ordErr } = existingId
-    ? await db.from('orders').update(row).eq('id', id)
-    : await db.from('orders').insert(row);
-  if (ordErr) { alert('Save failed: ' + ordErr.message); return false; }
-
-  // Replace items
-  await db.from('order_items').delete().eq('order_id', id);
-  if (data.items.length > 0) {
-    const { error: itemErr } = await db.from('order_items').insert(
-      data.items.map(i => ({ order_id: id, name: i.name, quantity: i.quantity, unit_price: i.unitPrice }))
-    );
-    if (itemErr) console.error('Item save error:', itemErr);
+  if (existingId) {
+    alert('Editing existing orders is not supported by create-order yet.');
+    return false;
   }
-  return true;
+
+  const items = (data.items || []).map(i => {
+    const sku_id = i.sku_id || findSkuIdByName(i.name);
+    const qty = parseInt(i.qty ?? i.quantity, 10) || 0;
+    return { sku_id, qty };
+  }).filter(i => i.sku_id && i.qty > 0);
+
+  if (!items.length) {
+    alert('Please add at least one valid SKU item.');
+    return false;
+  }
+
+  const payload = {
+    customer_name: data.customerName,
+    phone: data.phone || '',
+    address: data.address || '',
+    delivery_date: data.deliveryDate,
+    delivery_time: data.deliveryTime || '',
+    delivery: data.delivery || 'no',
+    items,
+  };
+
+  try {
+    const res = await fetch(`${SUPABASE_URL}/functions/v1/create-order`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        apikey: SUPABASE_KEY,
+        Authorization: `Bearer ${SUPABASE_KEY}`,
+      },
+      body: JSON.stringify(payload),
+    });
+
+    const body = await res.json().catch(() => ({}));
+    if (!res.ok) {
+      alert('Save failed: ' + (body.error || `HTTP ${res.status}`));
+      return false;
+    }
+    return true;
+  } catch (err) {
+    alert('Save failed: ' + (err?.message || String(err)));
+    return false;
+  }
 }
 
 async function quickStatus(id, val, stepEl) {
@@ -1724,6 +1780,35 @@ function offsetDay(ds, n) {
 }
 function orderTotal(items) {
   return items.reduce((s,i)=>s+(parseFloat(i.unitPrice)||0)*(parseInt(i.quantity)||0),0);
+}
+
+function skuUnitPrice(sku) {
+  if (!sku) return 0;
+  const price = parseFloat(sku.price) || 0;
+  if (sku.pricing_type === 'per_pack') {
+    const base = parseFloat(sku.base_quantity) || 1;
+    return base > 0 ? price / base : price;
+  }
+  return price;
+}
+
+function findSkuIdByName(name) {
+  const key = (name || '').trim().toLowerCase();
+  if (!key) return '';
+  const exact = skus.find(s => (s.name || '').trim().toLowerCase() === key);
+  if (exact) return exact.id;
+  const partial = skus.find(s => (s.name || '').trim().toLowerCase().includes(key) || key.includes((s.name || '').trim().toLowerCase()));
+  return partial ? partial.id : '';
+}
+
+function buildSkuOptions(selectedSkuId) {
+  if (!skus.length) return '<option value="">No active SKUs</option>';
+  const opts = ['<option value="">Select item</option>'];
+  skus.forEach(sku => {
+    const sel = sku.id === selectedSkuId ? ' selected' : '';
+    opts.push(`<option value="${esc(sku.id)}"${sel}>${esc(sku.name)}</option>`);
+  });
+  return opts.join('');
 }
 
 // ══════════════════════════════════════════════
@@ -2062,6 +2147,7 @@ function resetForm(){
   ['f-name','f-phone','f-address','f-date','f-time'].forEach(id=>document.getElementById(id).value='');
   document.getElementById('f-order-status').value='new';
   document.getElementById('f-payment').value='unpaid';
+  document.getElementById('f-delivery').value='no';
   document.getElementById('items-container').innerHTML='';
   refreshTotal();
 }
@@ -2073,32 +2159,38 @@ function fillForm(o){
   document.getElementById('f-time').value=o.deliveryTime||'';
   document.getElementById('f-order-status').value=o.orderStatus;
   document.getElementById('f-payment').value=o.paymentStatus;
+  document.getElementById('f-delivery').value=(o.address||'').trim() ? 'yes' : 'no';
   document.getElementById('items-container').innerHTML='';
   o.items.forEach(addItemRow);
 }
 function addItemRow(item){
   const c=document.getElementById('items-container');
   const r=document.createElement('div'); r.className='item-form-row';
+  const skuId = item?.sku_id || findSkuIdByName(item?.name) || '';
+  const qty = item?.qty ?? item?.quantity ?? '';
   r.innerHTML=`
-    <input class="inp-name"  type="text"   placeholder="Item name" value="${esc(item?.name||'')}" oninput="refreshTotal()">
-    <input class="inp-qty"   type="number" placeholder="Qty" min="1" value="${item?.quantity||''}" oninput="refreshTotal()">
-    <input class="inp-price" type="number" placeholder="Unit price" min="0" step="0.01" value="${item?.unitPrice||''}" oninput="refreshTotal()">
+    <select class="inp-sku" onchange="refreshTotal()">${buildSkuOptions(skuId)}</select>
+    <input class="inp-qty"   type="number" placeholder="Qty" min="1" step="1" value="${qty}" oninput="refreshTotal()">
     <button class="rm-item" onclick="this.parentElement.remove();refreshTotal()" title="Remove">✕</button>`;
   c.appendChild(r); refreshTotal();
 }
 function refreshTotal(){
   let t=0;
   document.querySelectorAll('#items-container .item-form-row').forEach(r=>{
-    t+=(parseFloat(r.querySelector('.inp-qty').value)||0)*(parseFloat(r.querySelector('.inp-price').value)||0);
+    const sku = skusById[r.querySelector('.inp-sku').value];
+    const qty = parseFloat(r.querySelector('.inp-qty').value) || 0;
+    t += qty * skuUnitPrice(sku);
   });
+  if (document.getElementById('f-delivery').value === 'yes') {
+    t += skuUnitPrice(skusById[DELIVERY_SKU_ID]);
+  }
   document.getElementById('total-preview').textContent=`Order Total: ${t.toFixed(2)}`;
 }
 function collectItems(){
   return Array.from(document.querySelectorAll('#items-container .item-form-row')).map(r=>({
-    name:      r.querySelector('.inp-name').value.trim(),
-    quantity:  r.querySelector('.inp-qty').value||'1',
-    unitPrice: r.querySelector('.inp-price').value||'0',
-  })).filter(i=>i.name);
+    sku_id: r.querySelector('.inp-sku').value,
+    qty: parseInt(r.querySelector('.inp-qty').value, 10) || 0,
+  })).filter(i=>i.sku_id && i.qty > 0);
 }
 
 async function saveOrder(){
@@ -2119,6 +2211,7 @@ async function saveOrder(){
     items,
     deliveryDate:  date,
     deliveryTime:  document.getElementById('f-time').value,
+    delivery:      document.getElementById('f-delivery').value,
     orderStatus:   document.getElementById('f-order-status').value,
     paymentStatus: document.getElementById('f-payment').value,
   };
@@ -2216,6 +2309,7 @@ function openImportModal() {
   document.getElementById('imp-phone').value='';
   document.getElementById('imp-time').value='';
   document.getElementById('imp-address').value='';
+  document.getElementById('imp-delivery').value='no';
   document.getElementById('imp-payment').value='unpaid';
   document.getElementById('imp-status').value='new';
   document.getElementById('import-overlay').classList.add('open');
@@ -2245,6 +2339,7 @@ function onImportInput() {
 
   errEl.classList.remove('show');
   parsedImport = p;
+  document.getElementById('imp-delivery').value = p.deliveryFee > 0 ? 'yes' : 'no';
   renderImportPreview(p);
   prevEl.classList.add('show');
   btnEl.disabled = (!p.customerName || p.items.length===0);
@@ -2293,6 +2388,7 @@ async function confirmImport() {
     items:         p.items.map(i=>({name:i.name, quantity:i.quantity, unitPrice:i.unitPrice})),
     deliveryDate:  p.deliveryDate || todayStr(),
     deliveryTime:  document.getElementById('imp-time').value,
+    delivery:      document.getElementById('imp-delivery').value,
     orderStatus:   document.getElementById('imp-status').value,
     paymentStatus: document.getElementById('imp-payment').value,
   };
@@ -2317,27 +2413,7 @@ async function confirmImport() {
 //  SAMPLE DATA  (first launch only)
 // ══════════════════════════════════════════════
 async function seedIfEmpty() {
-  const { count } = await db.from('orders').select('*', { count: 'exact', head: true });
-  if (count > 0) return;
-  const t=todayStr(), tom=offsetDay(t,1), d2=offsetDay(t,3);
-  const samples = [
-    { customerName:'Emily Carter', phone:'555-2847', address:'12 Blossom Lane, Maplewood',
-      items:[{name:'Sourdough Loaf',quantity:'2',unitPrice:'8.50'},{name:'Blueberry Muffins',quantity:'6',unitPrice:'2.25'}],
-      deliveryDate:t, deliveryTime:'09:30', orderStatus:'ready', paymentStatus:'paid' },
-    { customerName:'Marco Rossi', phone:'555-0193', address:'88 Oak St, Riverdale',
-      items:[{name:'Custom Birthday Cake',quantity:'1',unitPrice:'54.00'},{name:'Macarons (box of 12)',quantity:'1',unitPrice:'22.00'}],
-      deliveryDate:t, deliveryTime:'14:00', orderStatus:'in-progress', paymentStatus:'unpaid' },
-    { customerName:'Sophie Huang', phone:'555-7743', address:'3 Cedar Ave, Brookfield',
-      items:[{name:'Croissants',quantity:'12',unitPrice:'3.00'},{name:'Pain au Chocolat',quantity:'6',unitPrice:'3.50'}],
-      deliveryDate:t, deliveryTime:'08:00', orderStatus:'delivered', paymentStatus:'paid' },
-    { customerName:'James Okonkwo', address:'47 Willow Rd, Greenhill',
-      items:[{name:'Focaccia',quantity:'3',unitPrice:'7.00'},{name:'Almond Croissants',quantity:'8',unitPrice:'3.50'}],
-      deliveryDate:tom, deliveryTime:'11:00', orderStatus:'new', paymentStatus:'unpaid' },
-    { customerName:'Lily Park', phone:'555-3310', address:'200 Elm Street, Sunnyvale',
-      items:[{name:'Wedding Cake (3-tier)',quantity:'1',unitPrice:'180.00'},{name:'Cake Pops',quantity:'24',unitPrice:'2.50'}],
-      deliveryDate:d2, deliveryTime:'13:30', orderStatus:'in-progress', paymentStatus:'paid' },
-  ];
-  for (const s of samples) await _upsertOrder(s, null);
+  return;
 }
 
 // ══════════════════════════════════════════════
@@ -2373,6 +2449,7 @@ function resetFab() {
   });
   document.getElementById('fab-order-status').value = 'new';
   document.getElementById('fab-payment').value = 'unpaid';
+  document.getElementById('fab-delivery').value = 'no';
   document.getElementById('fab-items-container').innerHTML = '';
   document.getElementById('fab-paste').value = '';
   document.getElementById('fab-err').classList.remove('show');
@@ -2398,6 +2475,7 @@ function fabParse() {
   errEl.classList.remove('show');
   if (p.customerName) document.getElementById('fab-name').value = p.customerName;
   if (p.deliveryDate)  document.getElementById('fab-date').value = p.deliveryDate;
+  document.getElementById('fab-delivery').value = p.deliveryFee > 0 ? 'yes' : 'no';
   document.getElementById('fab-items-container').innerHTML = '';
   if (p.items.length) p.items.forEach(i => fabAddItemRow(i));
   else fabAddItemRow();
@@ -2407,10 +2485,11 @@ function fabAddItemRow(item) {
   const c = document.getElementById('fab-items-container');
   const r = document.createElement('div');
   r.className = 'item-form-row';
+  const skuId = item?.sku_id || findSkuIdByName(item?.name) || '';
+  const qty = item?.qty ?? item?.quantity ?? '';
   r.innerHTML = `
-    <input class="inp-name"  type="text"   placeholder="Item name"   value="${esc(item?.name||'')}" oninput="fabRefreshTotal()">
-    <input class="inp-qty"   type="number" placeholder="Qty"  min="1" value="${item?.quantity||''}" oninput="fabRefreshTotal()">
-    <input class="inp-price" type="number" placeholder="Price" min="0" step="0.01" value="${item?.unitPrice||''}" oninput="fabRefreshTotal()">
+    <select class="inp-sku" onchange="fabRefreshTotal()">${buildSkuOptions(skuId)}</select>
+    <input class="inp-qty" type="number" placeholder="Qty" min="1" step="1" value="${qty}" oninput="fabRefreshTotal()">
     <button class="rm-item" onclick="this.parentElement.remove();fabRefreshTotal()" title="Remove">✕</button>`;
   c.appendChild(r);
   fabRefreshTotal();
@@ -2418,18 +2497,21 @@ function fabAddItemRow(item) {
 function fabRefreshTotal() {
   let t = 0;
   document.querySelectorAll('#fab-items-container .item-form-row').forEach(r => {
-    t += (parseFloat(r.querySelector('.inp-qty').value)||0)
-       * (parseFloat(r.querySelector('.inp-price').value)||0);
+    const sku = skusById[r.querySelector('.inp-sku').value];
+    const qty = parseFloat(r.querySelector('.inp-qty').value) || 0;
+    t += qty * skuUnitPrice(sku);
   });
+  if (document.getElementById('fab-delivery').value === 'yes') {
+    t += skuUnitPrice(skusById[DELIVERY_SKU_ID]);
+  }
   document.getElementById('fab-total-preview').textContent = `Order Total: ${t.toFixed(2)}`;
 }
 function fabCollectItems() {
   return Array.from(document.querySelectorAll('#fab-items-container .item-form-row'))
     .map(r => ({
-      name:      r.querySelector('.inp-name').value.trim(),
-      quantity:  r.querySelector('.inp-qty').value  || '1',
-      unitPrice: r.querySelector('.inp-price').value || '0',
-    })).filter(i => i.name);
+      sku_id: r.querySelector('.inp-sku').value,
+      qty: parseInt(r.querySelector('.inp-qty').value, 10) || 0,
+    })).filter(i => i.sku_id && i.qty > 0);
 }
 async function fabSave() {
   const name = document.getElementById('fab-name').value.trim();
@@ -2449,6 +2531,7 @@ async function fabSave() {
     items,
     deliveryDate:  date,
     deliveryTime:  document.getElementById('fab-time').value,
+    delivery:      document.getElementById('fab-delivery').value,
     orderStatus:   document.getElementById('fab-order-status').value,
     paymentStatus: document.getElementById('fab-payment').value,
   };
@@ -2473,6 +2556,7 @@ async function fabSave() {
 // ══════════════════════════════════════════════
 async function init() {
   renderHeaderDate();
+  await loadSkus();
   await seedIfEmpty();
   await loadOrders();
   subscribeRealtime();
