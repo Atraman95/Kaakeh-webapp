@@ -1,0 +1,7 @@
+.DS_Store
+Terminal
+.DS_Store
+supabase/.DS_Store
+supabase/functions/.DS_Store
+node_modules/
+.env
