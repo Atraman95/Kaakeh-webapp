@@ -16,7 +16,7 @@ serve(async (req) => {
   const rawBody = await req.text()
   let event: Stripe.Event
   try {
-    event = stripe.webhooks.constructEvent(rawBody, signature, WEBHOOK_SECRET)
+    event = await stripe.webhooks.constructEventAsync(rawBody, signature, WEBHOOK_SECRET)
   } catch (err: any) {
     return new Response(`Webhook Error: ${err.message}`, { status: 400 })
   }

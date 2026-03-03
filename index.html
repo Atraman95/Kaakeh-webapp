@@ -50,57 +50,47 @@
     header {
       background: var(--primary);
       color: #fff;
-      padding: 0 20px;
-      height: 66px;
+      padding: 20px;
+      min-height: 170px;
       display: flex;
+      flex-direction: column;
       align-items: center;
-      justify-content: space-between;
+      justify-content: center;
       position: sticky;
       top: 0;
       z-index: 100;
       box-shadow: 0 2px 20px rgba(0,0,0,.22);
-      gap: 12px;
+      gap: 6px;
     }
 
     .logo {
       display: flex;
+      flex-direction: column;
       align-items: center;
-      gap: 10px;
-      flex-shrink: 0;
+      gap: 6px;
       text-decoration: none;
     }
     .logo-img {
-      height: 38px;
+      height: 140px;
       width: auto;
       object-fit: contain;
-      flex-shrink: 0;
-      filter: brightness(0) invert(1);
     }
-    .logo-name {
-      font-family: 'Playfair Display', Georgia, serif;
-      font-size: 1.18rem;
-      font-weight: 700;
-      color: #fff;
-      letter-spacing: .01em;
-      white-space: nowrap;
-      line-height: 1.1;
-    }
-    .logo-name .logo-sub {
-      display: block;
+    .logo-sub {
       font-family: 'Inter', sans-serif;
       font-size: .62rem;
-      font-weight: 500;
-      letter-spacing: .12em;
+      font-weight: 600;
+      letter-spacing: .16em;
       text-transform: uppercase;
       color: rgba(255,255,255,.60);
-      margin-top: 1px;
     }
 
     .header-right {
+      position: absolute;
+      top: 12px;
+      right: 20px;
       display: flex;
       align-items: center;
       gap: 10px;
-      flex-shrink: 0;
     }
 
     .header-date {
@@ -176,19 +166,16 @@
     .add-btn:active { transform: none; }
 
     @media (max-width: 560px) {
-      header { padding: 0 14px; height: 60px; }
+      header { padding: 14px; min-height: 130px; }
       .header-date { display: none; }
     }
     @media (max-width: 440px) {
-      .logo-name { font-size: 1rem; }
-      .logo-name .logo-sub { display: none; }
-      .logo-img  { height: 30px; }
+      .logo-img { height: 90px; }
+      .logo-sub { display: none; }
     }
     @media (max-width: 380px) {
-      .import-btn .btn-label { display: none; }
-      .add-btn    .btn-label { display: none; }
-      .import-btn { padding: 7px 9px; }
-      .add-btn    { padding: 7px 9px; }
+      .add-btn .btn-label { display: none; }
+      .add-btn { padding: 7px 9px; }
       .sync-label { display: none; }
     }
 
@@ -223,7 +210,7 @@
     /* ── STAT CARDS ── */
     .stats-grid {
       display: grid;
-      grid-template-columns: repeat(4, 1fr);
+      grid-template-columns: repeat(3, 1fr);
       gap: 14px;
       margin-bottom: 20px;
     }
@@ -270,12 +257,12 @@
       opacity: .85;
     }
     .stat-value {
-      font-family: 'Playfair Display', Georgia, serif;
+      font-family: 'Inter', -apple-system, sans-serif;
       font-size: 1.9rem;
       font-weight: 700;
       color: var(--primary);
       line-height: 1;
-      letter-spacing: -.01em;
+      letter-spacing: -.02em;
     }
     .stat-card.stat-gold  .stat-value { color: var(--gold); }
     .stat-card.stat-terra .stat-value { color: var(--terracotta); }
@@ -571,6 +558,7 @@
       display: grid;
       grid-template-columns: 1fr 1fr;
       gap: 10px 16px;
+      align-items: start;
     }
     @media (max-width: 440px) { .expand-detail-grid { grid-template-columns: 1fr; } }
     .expand-detail-row { display: flex; flex-direction: column; gap: 2px; }
@@ -1183,12 +1171,8 @@
 <!-- ─── HEADER ─── -->
 <header>
   <div class="logo">
-    <img src="/public/logo.svg" class="logo-img" alt="Kaakeh"
-         onerror="this.style.display='none'">
-    <div class="logo-name">
-      Kaakeh Orders
-      <span class="logo-sub">Order Management</span>
-    </div>
+    <img src="Logo.png" class="logo-img" alt="Kaakeh">
+    <span class="logo-sub">Order Management</span>
   </div>
 
   <div class="header-right">
@@ -1197,9 +1181,6 @@
       <div class="sync-dot" id="sync-dot"></div>
       <span class="sync-label" id="sync-label">Connecting…</span>
     </div>
-    <button class="import-btn" onclick="openImportModal()">
-      <span>📲</span><span class="btn-label">Import</span>
-    </button>
     <button class="add-btn" onclick="openModal()">
       <span>＋</span><span class="btn-label">New Order</span>
     </button>
@@ -1223,24 +1204,16 @@
     </div>
     <div class="stats-grid">
       <div class="stat-card">
-        <div class="stat-icon">📦</div>
         <div class="stat-value" id="stat-total">—</div>
         <div class="stat-label">Orders Today</div>
       </div>
       <div class="stat-card stat-gold">
-        <div class="stat-icon">💰</div>
         <div class="stat-value" id="stat-revenue">—</div>
-        <div class="stat-label">Revenue (SAR)</div>
+        <div class="stat-label">Revenue (AED)</div>
       </div>
       <div class="stat-card stat-terra">
-        <div class="stat-icon">⏳</div>
         <div class="stat-value" id="stat-unpaid">—</div>
         <div class="stat-label">Unpaid Orders</div>
-      </div>
-      <div class="stat-card stat-flag">
-        <div class="stat-icon">🚩</div>
-        <div class="stat-value" id="stat-flagged">—</div>
-        <div class="stat-label">Flagged Orders</div>
       </div>
     </div>
     <div class="filters"     id="today-filters"></div>
@@ -1942,7 +1915,6 @@ function renderToday() {
   document.getElementById('stat-total').textContent   = all.length;
   document.getElementById('stat-revenue').textContent = revenue.toFixed(0);
   document.getElementById('stat-unpaid').textContent  = unpaid;
-  document.getElementById('stat-flagged').textContent = flagged;
   buildFilterBar('today-filters');
   const list = applyFilters(all).sort((a,b)=>(a.deliveryTime||'').localeCompare(b.deliveryTime||''));
   renderList('today-list', list, 'No deliveries scheduled for today.');
@@ -1987,7 +1959,7 @@ function renderAll() {
 
 function renderList(cid,list,msg) {
   document.getElementById(cid).innerHTML=list.length===0
-    ?`<div class="empty"><div class="empty-icon">🍞</div><p>${msg}</p></div>`
+    ?`<div class="empty"><div class="empty-icon"><svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" opacity=".35"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></div><p>${msg}</p></div>`
     :list.map(renderCard).join('');
 }
 
@@ -2040,7 +2012,7 @@ function renderCard(o) {
         <strong>${dateLbl}</strong>
       </div>
       <div class="card-right">
-        <span class="card-total-price"><span class="curr">SAR</span>${total.toFixed(0)}</span>
+        <span class="card-total-price"><span class="curr">AED</span>${total.toFixed(0)}</span>
         <span class="expand-chevron">▼</span>
       </div>
     </div>
@@ -2067,15 +2039,15 @@ function renderExpanded(o) {
         const line = qty * price;
         return `<div class="expand-item-row">
           <span class="ei-name">${esc(i.name)}</span>
-          <span class="ei-qty">${qty} × SAR ${price.toFixed(0)}</span>
-          <span class="ei-total"><span class="curr">SAR</span>${line.toFixed(0)}</span>
+          <span class="ei-qty">${qty} × AED ${price.toFixed(0)}</span>
+          <span class="ei-total"><span class="curr">AED</span>${line.toFixed(0)}</span>
         </div>`;
       }).join('')
     : '<em style="opacity:.5;font-size:.83rem">No items</em>';
 
   // Mismatch warning
   const mismatchHtml = (o.statedTotal !== null && Math.abs(o.statedTotal - computedTotal) > 0.5)
-    ? `<div class="mismatch-warn">⚠ Stated total (SAR ${o.statedTotal.toFixed(0)}) differs from computed total (SAR ${computedTotal.toFixed(0)}). Check item prices.</div>`
+    ? `<div class="mismatch-warn">⚠ Stated total (AED ${o.statedTotal.toFixed(0)}) differs from computed total (AED ${computedTotal.toFixed(0)}). Check item prices.</div>`
     : '';
 
   // Raw message collapsible
@@ -2148,7 +2120,7 @@ function renderExpanded(o) {
       ${itemsHtml}
       <div class="expand-items-total">
         <span>Order Total</span>
-        <span><span class="curr">SAR</span>${computedTotal.toFixed(0)}</span>
+        <span><span class="curr">AED</span>${computedTotal.toFixed(0)}</span>
       </div>
       ${mismatchHtml}
     </div>
@@ -2165,12 +2137,9 @@ function renderExpanded(o) {
       ${payHtml}
       ${o.paymentLink ? `
         <div class="plink-row">
-          <a class="plink-url-sm" href="${esc(o.paymentLink)}" target="_blank" rel="noopener">
-            ${esc(o.paymentLink)}
-          </a>
           <button class="plink-copy-btn-sm"
                   onclick="event.stopPropagation();copyPaymentLink('${esc(o.paymentLink)}',this)">
-            Copy
+            Copy Payment Link
           </button>
         </div>` : ''}
     </div>
