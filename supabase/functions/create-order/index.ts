@@ -1,5 +1,6 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2"
+import Stripe from "stripe"
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -10,6 +11,10 @@ const supabase = createClient(
   Deno.env.get("PROJECT_URL")!,
   Deno.env.get("SERVICE_ROLE_KEY")!
 )
+
+const stripe = new Stripe(Deno.env.get("STRIPE_SECRET_KEY")!, {
+  apiVersion: "2024-04-10",
+})
 
 const DELIVERY_SKU_ID = "76f384c5-d815-4d14-90ce-ea3dfbaf5bec"
 
@@ -22,6 +27,7 @@ serve(async (req) => {
     const body = await req.json()
 
     const {
+      order_id,
       customer_name,
       phone,
       address,
@@ -48,24 +54,54 @@ serve(async (req) => {
 
     if (skuError) throw skuError
 
+    let order: any
+
+    // 🔁 EDIT MODE
+    if (order_id) {
+      const { data, error } = await supabase
+        .from("orders")
+        .update({
+          customer_name,
+          phone,
+          address,
+          delivery_date,
+          delivery_time
+        })
+        .eq("id", order_id)
+        .select()
+        .single()
+
+      if (error) throw error
+      order = data
+
+      const { error: deleteError } = await supabase
+        .from("order_items")
+        .delete()
+        .eq("order_id", order_id)
+
+      if (deleteError) throw deleteError
+
+    } else {
+      // 🆕 CREATE MODE
+      const { data, error } = await supabase
+        .from("orders")
+        .insert({
+          customer_name,
+          phone,
+          address,
+          delivery_date,
+          delivery_time,
+          order_status: "new",
+          payment_status: "unpaid"
+        })
+        .select()
+        .single()
+
+      if (error) throw error
+      order = data
+    }
+
     let subtotal = 0
-
-    const { data: order, error: orderError } = await supabase
-      .from("orders")
-      .insert({
-        customer_name,
-        phone,
-        address,
-        delivery_date,
-        delivery_time,
-        order_status: "new",
-        payment_status: "unpaid"
-      })
-      .select()
-      .single()
-
-    if (orderError) throw orderError
-
     const orderItems = []
 
     for (const item of items) {
@@ -115,38 +151,55 @@ serve(async (req) => {
       if (itemsError) throw itemsError
     }
 
+    // Stripe Checkout Session — CREATE mode only
+    let payment_link: string | null = null
+    if (!order_id) {
+      const successUrl = Deno.env.get("STRIPE_SUCCESS_URL") || "https://maoyacaiwerynhvhonai.supabase.co"
+      const cancelUrl  = Deno.env.get("STRIPE_CANCEL_URL")  || successUrl
+      const session = await stripe.checkout.sessions.create({
+        payment_method_types: ["card"],
+        line_items: [{
+          price_data: {
+            currency: "aed",
+            product_data: { name: `Kaakeh Order — ${customer_name}` },
+            unit_amount: Math.round(subtotal * 100),  // AED → fils
+          },
+          quantity: 1,
+        }],
+        mode: "payment",
+        success_url: successUrl,
+        cancel_url: cancelUrl,
+        metadata: { order_id: order.id, customer_name },
+      })
+      payment_link = session.url
+    }
+
     await supabase
       .from("orders")
-      .update({
-        subtotal,
-        grand_total: subtotal
-      })
+      .update({ subtotal, grand_total: subtotal, ...(payment_link ? { payment_link } : {}) })
       .eq("id", order.id)
 
     return new Response(
       JSON.stringify({
         order_id: order.id,
         subtotal,
-        grand_total: subtotal
+        grand_total: subtotal,
+        payment_link,
       }),
       {
         headers: { ...corsHeaders, "Content-Type": "application/json" }
       }
     )
 
-} catch (err) {
-  console.error("FULL ERROR:", err);
-
-  return new Response(
-    JSON.stringify({
-      raw: err,
-      message: err?.message,
-      stack: err?.stack
-    }),
-    {
-      status: 500,
-      headers: { ...corsHeaders, "Content-Type": "application/json" }
-    }
-  )
-}
+  } catch (err) {
+    return new Response(
+      JSON.stringify({
+        error: err?.message || err
+      }),
+      {
+        status: 500,
+        headers: { ...corsHeaders, "Content-Type": "application/json" }
+      }
+    )
+  }
 })

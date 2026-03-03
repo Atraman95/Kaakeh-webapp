@@ -1149,6 +1149,33 @@
       border-color: transparent !important;
     }
     button:disabled { cursor: not-allowed; }
+
+    /* ─── Payment Link Banner (modal) ─── */
+    .payment-link-banner {
+      display:flex; align-items:center; gap:8px; flex-wrap:wrap;
+      background:#f0fdf4; border:1px solid #86efac; border-radius:8px;
+      padding:10px 12px; margin-bottom:10px;
+    }
+    .plink-label { font-size:.75rem; font-weight:700; color:#16a34a; white-space:nowrap; }
+    .plink-url { flex:1; font-size:.7rem; color:#374151; word-break:break-all; }
+    .plink-copy-btn {
+      padding:4px 10px; border-radius:6px; border:1px solid #16a34a;
+      background:#dcfce7; color:#15803d; font-size:.75rem; font-weight:600;
+      cursor:pointer; white-space:nowrap;
+    }
+    .plink-copy-btn:hover { background:#bbf7d0; }
+
+    /* ─── Payment Link in expanded card ─── */
+    .plink-row { display:flex; align-items:center; gap:8px; margin-top:6px; }
+    .plink-url-sm {
+      flex:1; font-size:.7rem; color:#0369a1; text-decoration:none; word-break:break-all;
+    }
+    .plink-url-sm:hover { text-decoration:underline; }
+    .plink-copy-btn-sm {
+      padding:3px 8px; border-radius:5px; border:1px solid #94a3b8;
+      background:#f8fafc; color:#334155; font-size:.72rem; cursor:pointer; white-space:nowrap;
+    }
+    .plink-copy-btn-sm:hover { background:#e2e8f0; }
   </style>
 </head>
 <body>
@@ -1530,6 +1557,29 @@ function setBtnState(btn, state, successText) {
     btn.classList.remove('btn-success');
   }
 }
+
+function showPaymentLinkBanner(url) {
+  const saveBtn = document.getElementById('btn-save-order');
+  if (!saveBtn) return;
+  const old = saveBtn.parentElement.querySelector('.payment-link-banner');
+  if (old) old.remove();
+  const banner = document.createElement('div');
+  banner.className = 'payment-link-banner';
+  banner.innerHTML = `
+    <span class="plink-label">Payment Link</span>
+    <span class="plink-url">${url}</span>
+    <button class="plink-copy-btn" onclick="copyPaymentLink('${url}',this)">Copy</button>`;
+  saveBtn.insertAdjacentElement('beforebegin', banner);
+}
+
+function copyPaymentLink(url, btn) {
+  navigator.clipboard.writeText(url).then(() => {
+    const orig = btn.textContent;
+    btn.textContent = 'Copied!';
+    setTimeout(() => { btn.textContent = orig; }, 2000);
+  }).catch(() => { prompt('Copy this link:', url); });
+}
+
 let expandedOrderId = null;
 const _notesMap    = {};
 const _rawExpanded = {};
@@ -1551,6 +1601,7 @@ function dbToOrder(row, itemRows) {
     requiresReview: row.requires_review || 'no',
     statedTotal:    row.stated_total    ? parseFloat(row.stated_total)    : null,
     rawMessageText: row.raw_message_text || '',
+    paymentLink:    row.payment_link    || null,
     items: itemRows.map(i => ({
       name:      i.product_name || i.name || '',
       quantity:  i.qty ?? i.quantity ?? 0,
@@ -1653,7 +1704,7 @@ async function _upsertOrder(data, existingId) {
       alert('Save failed: ' + (body.error || `HTTP ${res.status}`));
       return false;
     }
-    return true;
+    return body.payment_link || true;
   } catch (err) {
     alert('Save failed: ' + (err?.message || String(err)));
     return false;
@@ -2112,6 +2163,16 @@ function renderExpanded(o) {
     <div class="expand-section">
       <div class="expand-section-title">Payment</div>
       ${payHtml}
+      ${o.paymentLink ? `
+        <div class="plink-row">
+          <a class="plink-url-sm" href="${esc(o.paymentLink)}" target="_blank" rel="noopener">
+            ${esc(o.paymentLink)}
+          </a>
+          <button class="plink-copy-btn-sm"
+                  onclick="event.stopPropagation();copyPaymentLink('${esc(o.paymentLink)}',this)">
+            Copy
+          </button>
+        </div>` : ''}
     </div>
     <div class="expand-section">
       <div class="expand-section-title">Notes</div>
@@ -2215,11 +2276,16 @@ async function saveOrder(){
     orderStatus:   document.getElementById('f-order-status').value,
     paymentStatus: document.getElementById('f-payment').value,
   };
-  const ok = await _upsertOrder(data, editId);
-  if (ok) {
+  const result = await _upsertOrder(data, editId);
+  if (result) {
     setBtnState(btn, 'success', editId ? 'Changes Saved!' : 'Order Saved!');
     await loadOrders();
-    setTimeout(() => closeModal(), 1500);
+    if (!editId && typeof result === 'string') {
+      showPaymentLinkBanner(result);
+      setTimeout(() => closeModal(), 4500);
+    } else {
+      setTimeout(() => closeModal(), 1500);
+    }
   } else {
     setBtnState(btn, 'idle');
   }
