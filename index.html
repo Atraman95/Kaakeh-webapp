@@ -270,8 +270,16 @@
     /* ── MAIN ── */
     main {
       padding: 16px;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    #view-today,
+    #view-upcoming,
+    #view-all {
       max-width: 860px;
       margin: 0 auto;
+      width: 100%;
     }
 
     .view-header {
@@ -2011,6 +2019,409 @@
     .plink-copy-btn-sm:hover {
       background: #e2e8f0;
     }
+
+    /* ─── CALENDAR VIEW PORTED STYLES ─── */
+    .cal-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      padding: 16px;
+      border-bottom: 1px solid var(--border);
+      background: var(--surface-2);
+    }
+
+    .cal-header-left {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .cal-header-icon {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 8px;
+      background: var(--primary);
+      color: #fff;
+      padding: 6px;
+    }
+
+    .cal-header-title {
+      font-size: 1.1rem;
+      font-weight: 600;
+      letter-spacing: -0.015em;
+      color: var(--text);
+    }
+
+    .cal-header-sub {
+      display: none;
+    }
+
+    .cal-header-right {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .cal-nav-btn,
+    .cal-nav-icon-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 6px;
+      font-size: 0.875rem;
+      font-weight: 500;
+      cursor: pointer;
+      border: 1px solid var(--border);
+      background: var(--surface);
+      color: var(--text);
+      transition: background-color 0.2s;
+      white-space: nowrap;
+    }
+
+    .cal-nav-btn:hover,
+    .cal-nav-icon-btn:hover {
+      background-color: var(--surface-2);
+    }
+
+    .cal-nav-btn {
+      height: 32px;
+      padding: 0 12px;
+    }
+
+    .cal-nav-icon-btn {
+      width: 32px;
+      height: 32px;
+    }
+
+    .cal-layout {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      flex: 1;
+      min-height: 0;
+    }
+
+    @media (min-width: 1024px) {
+      .cal-layout {
+        flex-direction: row;
+      }
+    }
+
+    .cal-grid-cont {
+      flex: 1;
+      min-width: 0;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      background: var(--surface);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .cal-weekdays {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .cal-weekdays div {
+      padding: 10px 8px;
+      text-align: center;
+      font-size: 0.75rem;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--text-muted);
+    }
+
+    .cal-grid {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      flex: 1;
+    }
+
+    .cal-cell {
+      position: relative;
+      display: flex;
+      min-height: 80px;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 4px;
+      border-bottom: 1px solid var(--border);
+      border-right: 1px solid var(--border);
+      padding: 6px;
+      text-align: left;
+      transition: background-color 0.15s;
+      background: none;
+      cursor: pointer;
+      color: var(--text);
+    }
+
+    @media (min-width: 768px) {
+      .cal-cell {
+        min-height: 100px;
+        padding: 8px;
+      }
+    }
+
+    .cal-cell:hover {
+      background-color: rgba(0, 0, 0, 0.02);
+    }
+
+    .cal-cell:nth-child(7n) {
+      border-right: none;
+    }
+
+    .cal-cell-muted {
+      background-color: rgba(0, 0, 0, 0.015);
+      color: var(--text-muted);
+    }
+
+    .cal-cell-active {
+      background-color: rgba(123, 31, 46, 0.05);
+      box-shadow: inset 0 0 0 1px rgba(123, 31, 46, 0.2);
+    }
+
+    .cal-date-num {
+      display: flex;
+      width: 28px;
+      height: 28px;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+      font-size: 0.875rem;
+      font-weight: 500;
+    }
+
+    .cal-date-num.today {
+      background-color: var(--primary);
+      color: #fff;
+      font-weight: 600;
+    }
+
+    .cal-cell-active:not(.today) .cal-date-num {
+      background-color: var(--surface-2);
+      color: var(--text);
+    }
+
+    .cal-dot-wrap {
+      display: flex;
+      align-items: center;
+      gap: 2px;
+    }
+
+    .cal-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+    }
+
+    .cal-dot.bg-new {
+      background-color: #3b82f6;
+    }
+
+    /* blue */
+    .cal-dot.bg-in-progress {
+      background-color: #f59e0b;
+    }
+
+    /* amber */
+    .cal-dot.bg-ready {
+      background-color: #10b981;
+    }
+
+    /* emerald */
+    .cal-dot.bg-delivered {
+      background-color: #64748b;
+    }
+
+    /* slate */
+
+    .cal-events-desktop {
+      display: none;
+      width: 100%;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    @media (min-width: 768px) {
+      .cal-events-desktop {
+        display: flex;
+      }
+
+      .cal-dot-wrap {
+        display: none;
+      }
+    }
+
+    .cal-ev-label {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      border-radius: 4px;
+      padding: 2px 4px;
+      font-size: 0.6875rem;
+      line-height: 1.25;
+      font-weight: 500;
+      border: 1px solid transparent;
+    }
+
+    .cal-ev-label.label-new {
+      background-color: #eff6ff;
+      color: #1d4ed8;
+      border-color: #bfdbfe;
+    }
+
+    .cal-ev-label.label-in-progress {
+      background-color: #fffbeb;
+      color: #b45309;
+      border-color: #fde68a;
+    }
+
+    .cal-ev-label.label-ready {
+      background-color: #ecfdf5;
+      color: #047857;
+      border-color: #a7f3d0;
+    }
+
+    .cal-ev-label.label-delivered {
+      background-color: #f8fafc;
+      color: #475569;
+      border-color: #e2e8f0;
+    }
+
+    .cal-sidebar {
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      background: var(--surface);
+    }
+
+    @media (min-width: 1024px) {
+      .cal-sidebar {
+        width: 320px;
+        flex-shrink: 0;
+      }
+    }
+
+    @media (min-width: 1280px) {
+      .cal-sidebar {
+        width: 360px;
+      }
+    }
+
+    .cal-side-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid var(--border);
+      padding: 12px 16px;
+    }
+
+    .cal-side-title {
+      font-size: 1rem;
+      font-weight: 600;
+      color: var(--text);
+      line-height: 1.4;
+    }
+
+    .cal-side-sub {
+      font-size: 0.875rem;
+      color: var(--text-muted);
+    }
+
+    .cal-side-list-cont {
+      flex: 1;
+      overflow-y: auto;
+      padding: 12px;
+    }
+
+    .cal-side-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .cal-side-empty {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 48px 0;
+      text-align: center;
+    }
+
+    .cal-empty-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background-color: rgba(0, 0, 0, 0.03);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 12px;
+      color: var(--text-muted);
+    }
+
+    .cal-side-evt {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      padding: 12px;
+      text-align: left;
+      transition: all 0.2s;
+      background: none;
+      cursor: pointer;
+      width: 100%;
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.02);
+    }
+
+    .cal-side-evt:hover {
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.04);
+      transform: translateY(-1px);
+      border-color: var(--primary-lt);
+    }
+
+    .cal-evt-top {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 8px;
+    }
+
+    .cal-evt-title {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.875rem;
+      font-weight: 600;
+      color: var(--text);
+    }
+
+    .cal-evt-time {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 0.75rem;
+      color: var(--text-muted);
+    }
+
+    .cal-evt-desc {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      max-height: 2.8em;
+      overflow: hidden;
+      line-height: 1.4;
+    }
   </style>
 </head>
 
@@ -2039,6 +2450,7 @@
   <nav>
     <div class="tab active" data-tab="today" onclick="switchTab('today')">Today</div>
     <div class="tab" data-tab="upcoming" onclick="switchTab('upcoming')">Upcoming</div>
+    <div class="tab" data-tab="calendar" onclick="switchTab('calendar')">Calendar</div>
     <div class="tab" data-tab="all" onclick="switchTab('all')">All Orders</div>
   </nav>
 
@@ -2093,6 +2505,79 @@
       </div>
       <div class="filters" id="all-filters"></div>
       <div class="orders-list" id="all-list"></div>
+    </div>
+
+    <!-- CALENDAR VIEW -->
+    <div id="view-calendar" class="view flex flex-col" style="display:none">
+      <div class="cal-layout">
+        <div class="cal-grid-cont">
+          <div class="cal-header">
+            <div class="cal-header-left">
+              <div class="cal-header-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                  stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                  class="lucide lucide-calendar-days">
+                  <path d="M8 2v4" />
+                  <path d="M16 2v4" />
+                  <rect width="18" height="18" x="3" y="4" rx="2" />
+                  <path d="M3 10h18" />
+                  <path d="M8 14h.01" />
+                  <path d="M12 14h.01" />
+                  <path d="M16 14h.01" />
+                  <path d="M8 18h.01" />
+                  <path d="M12 18h.01" />
+                  <path d="M16 18h.01" />
+                </svg>
+              </div>
+              <div>
+                <h1 class="cal-header-title" id="cal-month-title">Month Year</h1>
+                <p class="cal-header-sub" id="cal-today-sub">Today</p>
+              </div>
+            </div>
+            <div class="cal-header-right">
+              <button class="cal-nav-btn" onclick="calGoToday()">Today</button>
+              <button class="cal-nav-icon-btn" onclick="calPrevMonth()" aria-label="Previous month">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+                  stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="m15 18-6-6 6-6" />
+                </svg>
+              </button>
+              <button class="cal-nav-icon-btn" onclick="calNextMonth()" aria-label="Next month">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+                  stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="m9 18 6-6-6-6" />
+                </svg>
+              </button>
+            </div>
+          </div>
+
+          <div class="cal-weekdays">
+            <div>Sun</div>
+            <div>Mon</div>
+            <div>Tue</div>
+            <div>Wed</div>
+            <div>Thu</div>
+            <div>Fri</div>
+            <div>Sat</div>
+          </div>
+          <div class="cal-grid" id="cal-grid">
+            <!-- Grid generated via JS -->
+          </div>
+        </div>
+        <div class="cal-sidebar">
+          <div class="cal-side-header">
+            <div>
+              <h2 class="cal-side-title" id="cal-side-day">Weekday</h2>
+              <p class="cal-side-sub" id="cal-side-date">Mon DD, YYYY</p>
+            </div>
+          </div>
+          <div class="cal-side-list-cont">
+            <div id="cal-side-list" class="cal-side-list">
+              <!-- Sidebar events generated via JS -->
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   </main>
 
@@ -2702,12 +3187,13 @@
       curTab = tab;
       document.querySelectorAll('.tab').forEach(t => t.classList.toggle('active', t.dataset.tab === tab));
       document.querySelectorAll('.view').forEach(v => v.style.display = 'none');
-      document.getElementById(`view-${tab}`).style.display = '';
+      document.getElementById(`view-${tab}`).style.display = tab === 'calendar' ? 'flex' : '';
       render();
     }
     function render() {
       if (curTab === 'today') renderToday();
       else if (curTab === 'upcoming') renderUpcoming();
+      else if (curTab === 'calendar') renderCalendar();
       else renderAll();
     }
 
@@ -2821,6 +3307,225 @@
       document.getElementById(cid).innerHTML = list.length === 0
         ? `<div class="empty"><div class="empty-icon"><svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" opacity=".35"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></div><p>${msg}</p></div>`
         : list.map(renderCard).join('');
+    }
+
+    // ══════════════════════════════════════════════
+    //  CALENDAR VIEW LOGIC
+    // ══════════════════════════════════════════════
+
+    let calCurrentMonthDate = new Date();
+    let calSelectedDate = new Date();
+
+    function getFirstDayOfMonth(year, month) {
+      return new Date(year, month, 1);
+    }
+
+    function getLastDayOfMonth(year, month) {
+      return new Date(year, month + 1, 0);
+    }
+
+    function isSameDate(d1, d2) {
+      return d1.getFullYear() === d2.getFullYear() &&
+        d1.getMonth() === d2.getMonth() &&
+        d1.getDate() === d2.getDate();
+    }
+
+    function toISODateString(d) {
+      const yyyy = d.getFullYear();
+      const mm = String(d.getMonth() + 1).padStart(2, '0');
+      const dd = String(d.getDate()).padStart(2, '0');
+      return `${yyyy}-${mm}-${dd}`;
+    }
+
+    function calGoToday() {
+      const today = new Date();
+      calCurrentMonthDate = new Date(today.getFullYear(), today.getMonth(), 1);
+      calSelectedDate = today;
+      renderCalendar();
+    }
+
+    function calPrevMonth() {
+      calCurrentMonthDate = new Date(calCurrentMonthDate.getFullYear(), calCurrentMonthDate.getMonth() - 1, 1);
+      renderCalendar();
+    }
+
+    function calNextMonth() {
+      calCurrentMonthDate = new Date(calCurrentMonthDate.getFullYear(), calCurrentMonthDate.getMonth() + 1, 1);
+      renderCalendar();
+    }
+
+    function calSelectDate(y, m, d) {
+      calSelectedDate = new Date(y, m, d);
+      renderCalendarDetails(); // Only update sidebar and active states, no need to re-render whole string
+      renderCalendarGrid();
+    }
+
+    function renderCalendar() {
+      // 1. Render Header
+      const mNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+      document.getElementById('cal-month-title').innerText = `${mNames[calCurrentMonthDate.getMonth()]} ${calCurrentMonthDate.getFullYear()}`;
+
+      const dayNamesFull = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+      const today = new Date();
+      document.getElementById('cal-today-sub').innerText = `${dayNamesFull[today.getDay()]}, ${mNames[today.getMonth()]} ${today.getDate()}`;
+
+      // 2. Render Grid
+      renderCalendarGrid();
+
+      // 3. Render Details
+      renderCalendarDetails();
+    }
+
+    function renderCalendarGrid() {
+      const gridEl = document.getElementById('cal-grid');
+      if (!gridEl) return;
+
+      const year = calCurrentMonthDate.getFullYear();
+      const month = calCurrentMonthDate.getMonth();
+      const firstDay = getFirstDayOfMonth(year, month);
+      const lastDay = getLastDayOfMonth(year, month);
+
+      // Calculate start of grid (Sunday)
+      const startDate = new Date(firstDay);
+      startDate.setDate(firstDay.getDate() - firstDay.getDay());
+
+      // Calculate end of grid (Saturday)
+      const endDate = new Date(lastDay);
+      if (endDate.getDay() !== 6) {
+        endDate.setDate(lastDay.getDate() + (6 - lastDay.getDay()));
+      }
+
+      const today = new Date();
+      let html = '';
+
+      let curDate = new Date(startDate);
+      let cellCount = 0;
+
+      while (curDate <= endDate || cellCount % 7 !== 0) {
+        const y = curDate.getFullYear();
+        const m = curDate.getMonth();
+        const d = curDate.getDate();
+        const isoStr = toISODateString(curDate);
+
+        const isCurrentMonth = (m === month);
+        const isSelected = isSameDate(curDate, calSelectedDate);
+        const isToday = isSameDate(curDate, today);
+
+        // Find events/orders for this day
+        const dayOrders = orders.filter(o => o.deliveryDate === isoStr);
+        // Sort day orders by time
+        dayOrders.sort((a, b) => (a.deliveryTime || '24:00').localeCompare(b.deliveryTime || '24:00'));
+
+        let classes = 'cal-cell';
+        if (!isCurrentMonth) classes += ' cal-cell-muted';
+        if (isSelected) classes += ' cal-cell-active';
+
+        let numClasses = 'cal-date-num';
+        if (isToday) numClasses += ' today';
+
+        // Dots (Mobile)
+        let dotsHtml = '';
+        if (dayOrders.length > 0) {
+          dotsHtml += '<div class="cal-dot-wrap">';
+          const maxDots = 3;
+          for (let i = 0; i < Math.min(dayOrders.length, maxDots); i++) {
+            dotsHtml += `<div class="cal-dot bg-${dayOrders[i].orderStatus}"></div>`;
+          }
+          if (dayOrders.length > maxDots) {
+            dotsHtml += `<span style="font-size:10px;color:var(--text-muted);margin-left:2px">+${dayOrders.length - maxDots}</span>`;
+          }
+          dotsHtml += '</div>';
+        }
+
+        // Labels (Desktop)
+        let labelsHtml = '';
+        if (dayOrders.length > 0) {
+          labelsHtml += '<div class="cal-events-desktop">';
+          const maxLabels = 2;
+          for (let i = 0; i < Math.min(dayOrders.length, maxLabels); i++) {
+            const ev = dayOrders[i];
+            const title = ev.customerName || 'Unnamed';
+            labelsHtml += `
+              <div class="cal-ev-label label-${ev.orderStatus}">
+                <div class="cal-dot bg-${ev.orderStatus}"></div>
+                <span style="overflow:hidden;text-overflow:ellipsis">${esc(title)}</span>
+              </div>
+            `;
+          }
+          if (dayOrders.length > maxLabels) {
+            labelsHtml += `<span style="font-size:10px;color:var(--text-muted);padding-left:4px">+${dayOrders.length - maxLabels} more</span>`;
+          }
+          labelsHtml += '</div>';
+        }
+
+        html += `
+          <button class="${classes}" onclick="calSelectDate(${y}, ${m}, ${d})">
+            <span class="${numClasses}">${d}</span>
+            ${dotsHtml}
+            ${labelsHtml}
+          </button>
+        `;
+
+        curDate.setDate(curDate.getDate() + 1);
+        cellCount++;
+      }
+
+      gridEl.innerHTML = html;
+    }
+
+    function renderCalendarDetails() {
+      const listEl = document.getElementById('cal-side-list');
+      if (!listEl) return;
+
+      const isoStr = toISODateString(calSelectedDate);
+      const dayOrders = orders.filter(o => o.deliveryDate === isoStr);
+      dayOrders.sort((a, b) => (a.deliveryTime || '24:00').localeCompare(b.deliveryTime || '24:00'));
+
+      const mNamesShort = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+      const dayNamesFull = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+
+      document.getElementById('cal-side-day').innerText = dayNamesFull[calSelectedDate.getDay()];
+      document.getElementById('cal-side-date').innerText = `${mNamesShort[calSelectedDate.getMonth()]} ${calSelectedDate.getDate()}, ${calSelectedDate.getFullYear()}`;
+
+      if (dayOrders.length === 0) {
+        let emptyHtml = `
+          <div class="cal-side-empty">
+            <div class="cal-empty-icon">
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-clock"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            </div>
+            <p style="font-size:0.875rem;font-weight:500;color:var(--text-muted)">No deliveries scheduled</p>
+          </div>
+        `;
+        listEl.innerHTML = emptyHtml;
+        return;
+      }
+
+      let html = '';
+      dayOrders.forEach(o => {
+        const timeStr = o.deliveryTime ? fmtTime(o.deliveryTime) : 'Time not set';
+        const stLabel = o.orderStatus.replace('-', ' ').replace(/\b\w/g, c => c.toUpperCase());
+
+        let itemsDesc = o.items.map(i => `${i.quantity || i.qty || 1}x ${i.name || 'Unnamed Item'}`).join(', ');
+        if (itemsDesc.length > 50) itemsDesc = itemsDesc.substring(0, 47) + '...';
+
+        html += `
+          <button class="cal-side-evt" onclick="openModal('${o.id}')">
+            <div class="cal-evt-top">
+              <div class="cal-evt-title">
+                <div class="cal-dot bg-${o.orderStatus}"></div>
+                <span>${esc(o.customerName || 'Unnamed')}</span>
+              </div>
+            </div>
+            <div class="cal-evt-time">
+              <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+              <span>${esc(timeStr)}</span>
+            </div>
+            ${itemsDesc ? `<div class="cal-evt-desc">${esc(itemsDesc)}</div>` : ''}
+          </button>
+        `;
+      });
+
+      listEl.innerHTML = html;
     }
 
     // ══════════════════════════════════════════════
