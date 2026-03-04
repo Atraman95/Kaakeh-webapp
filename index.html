@@ -50,28 +50,28 @@
     header {
       background: var(--primary);
       color: #fff;
-      padding: 20px;
-      min-height: 170px;
+      padding: 0 20px;
+      height: 66px;
       display: flex;
-      flex-direction: column;
       align-items: center;
-      justify-content: center;
+      justify-content: space-between;
       position: sticky;
       top: 0;
       z-index: 100;
       box-shadow: 0 2px 20px rgba(0,0,0,.22);
-      gap: 6px;
+      gap: 12px;
     }
 
     .logo {
       display: flex;
-      flex-direction: column;
+      flex-direction: row;
       align-items: center;
-      gap: 6px;
+      gap: 10px;
+      flex-shrink: 0;
       text-decoration: none;
     }
     .logo-img {
-      height: 140px;
+      height: 60px;
       width: auto;
       object-fit: contain;
     }
@@ -85,12 +85,10 @@
     }
 
     .header-right {
-      position: absolute;
-      top: 12px;
-      right: 20px;
       display: flex;
       align-items: center;
       gap: 10px;
+      flex-shrink: 0;
     }
 
     .header-date {
@@ -166,11 +164,11 @@
     .add-btn:active { transform: none; }
 
     @media (max-width: 560px) {
-      header { padding: 14px; min-height: 130px; }
+      header { padding: 0 14px; height: 60px; }
       .header-date { display: none; }
     }
     @media (max-width: 440px) {
-      .logo-img { height: 90px; }
+      .logo-img { height: 44px; }
       .logo-sub { display: none; }
     }
     @media (max-width: 380px) {
@@ -561,15 +559,17 @@
       align-items: start;
     }
     @media (max-width: 440px) { .expand-detail-grid { grid-template-columns: 1fr; } }
-    .expand-detail-row { display: flex; flex-direction: column; gap: 2px; }
+    .expand-detail-row { display: block; }
     .expand-detail-label {
+      display: block;
       font-size: .61rem;
       font-weight: 700;
       text-transform: uppercase;
       letter-spacing: .09em;
       color: var(--text-muted);
+      margin-bottom: 2px;
     }
-    .expand-detail-val { font-size: .83rem; color: var(--text); font-weight: 500; }
+    .expand-detail-val { display: block; font-size: .83rem; color: var(--text); font-weight: 500; }
     .expand-detail-val.empty { color: var(--text-muted); font-style: italic; font-weight: 400; }
 
     /* raw message toggle */
@@ -1540,7 +1540,6 @@ function showPaymentLinkBanner(url) {
   banner.className = 'payment-link-banner';
   banner.innerHTML = `
     <span class="plink-label">Payment Link</span>
-    <span class="plink-url">${url}</span>
     <button class="plink-copy-btn" onclick="copyPaymentLink('${url}',this)">Copy</button>`;
   saveBtn.insertAdjacentElement('beforebegin', banner);
 }
@@ -2165,6 +2164,8 @@ function esc(s){ return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').repla
 // ══════════════════════════════════════════════
 function openModal(id) {
   editId=id||null;
+  const oldBanner = document.querySelector('.payment-link-banner');
+  if (oldBanner) oldBanner.remove();
   document.getElementById('modal-title').textContent=editId?'Edit Order':'New Order';
   document.getElementById('overlay').classList.add('open');
   if (editId) { const o=orders.find(x=>x.id===editId); if(o)fillForm(o); }
