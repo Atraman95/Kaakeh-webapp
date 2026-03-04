@@ -2063,25 +2063,25 @@ function renderExpanded(o) {
     ? `<span class="expand-detail-val">${esc(v)}</span>`
     : `<span class="expand-detail-val empty">${fb}</span>`;
   const detailsHtml = `
-    <div class="expand-detail-grid">
-      <div class="expand-detail-row">
-        <span class="expand-detail-label">Date</span>
-        ${o.deliveryDate ? `<span class="expand-detail-val">${fmtDate(o.deliveryDate)}</span>` : '<span class="expand-detail-val empty">Not set</span>'}
-      </div>
-      <div class="expand-detail-row">
-        <span class="expand-detail-label">Time</span>
-        ${o.deliveryTime ? `<span class="expand-detail-val">${fmtTime(o.deliveryTime)}</span>` : '<span class="expand-detail-val empty">Not set</span>'}
-      </div>
-      <div class="expand-detail-row">
-        <span class="expand-detail-label">Address</span>
-        ${dv(o.address, 'Not set')}
-      </div>
-      <div class="expand-detail-row">
-        <span class="expand-detail-label">Phone</span>
-        ${dv(o.phone, 'Not set')}
-      </div>
+  <div class="expand-detail-grid">
+    <div class="expand-detail-row">
+      <span class="expand-detail-label">Date</span>
+      ${o.deliveryDate ? `<span class="expand-detail-val">${fmtDate(o.deliveryDate)}</span>` : '<span class="expand-detail-val empty">Not set</span>'}
     </div>
-    ${rawHtml}`;
+    <div class="expand-detail-row">
+      <span class="expand-detail-label">Time</span>
+      ${o.deliveryTime ? `<span class="expand-detail-val">${fmtTime(o.deliveryTime)}</span>` : '<span class="expand-detail-val empty">Not set</span>'}
+    </div>
+    <div class="expand-detail-row">
+      <span class="expand-detail-label">Address</span>
+      ${dv(o.address, 'Not set')}
+    </div>
+    <div class="expand-detail-row">
+      <span class="expand-detail-label">Phone</span>
+      ${dv(o.phone, 'Not set')}
+    </div>
+  </div>
+  ${rawHtml}`;
 
   // Stepper
   const stepperHtml = STEPS.map((s, i) => {
@@ -2166,6 +2166,8 @@ function openModal(id) {
   editId=id||null;
   const oldBanner = document.querySelector('.payment-link-banner');
   if (oldBanner) oldBanner.remove();
+  const saveBtn = document.getElementById('btn-save-order');
+  if (saveBtn) { saveBtn.disabled = false; saveBtn.classList.remove('btn-success'); saveBtn.innerHTML = 'Save Order'; }
   document.getElementById('modal-title').textContent=editId?'Edit Order':'New Order';
   document.getElementById('overlay').classList.add('open');
   if (editId) { const o=orders.find(x=>x.id===editId); if(o)fillForm(o); }
