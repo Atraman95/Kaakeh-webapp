@@ -8,7 +8,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link
-    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@600;700&display=swap"
+    href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400&family=Jost:wght@300;400;500;600&display=swap"
     rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
   <style>
@@ -45,30 +45,62 @@
       --shadow-lg: 0 8px 32px rgba(80, 20, 10, .18);
       --radius: 14px;
       --radius-sm: 8px;
+      --font-body: 'Jost', sans-serif;
+      --font-display: 'Cormorant Garamond', Georgia, serif;
     }
 
     body {
-      background: var(--bg);
+      background:
+        radial-gradient(ellipse at 15% 20%, rgba(201,149,42,0.12) 0%, transparent 55%),
+        radial-gradient(ellipse at 85% 80%, rgba(123,31,46,0.10) 0%, transparent 55%),
+        radial-gradient(ellipse at 50% 50%, rgba(193,87,27,0.06) 0%, transparent 70%),
+        #F7F0E8;
       color: var(--text);
-      font-family: 'Inter', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+      font-family: var(--font-body);
       min-height: 100vh;
       line-height: 1.4;
     }
 
+    body::after {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23noise)' opacity='1'/%3E%3C/svg%3E");
+      opacity: 0.03;
+      pointer-events: none;
+      z-index: 9999;
+    }
+
     /* ── HEADER ── */
     header {
-      background: var(--primary);
+      background: linear-gradient(135deg, #5C1520, var(--primary), #8B2535);
       color: #fff;
       padding: 0 20px;
-      height: 66px;
+      height: 72px;
       display: flex;
       align-items: center;
       justify-content: space-between;
       position: sticky;
       top: 0;
       z-index: 100;
-      box-shadow: 0 2px 20px rgba(0, 0, 0, .22);
+      box-shadow: 0 2px 20px rgba(0, 0, 0, .22), 0 1px 0 rgba(201,149,42,0.4);
       gap: 12px;
+    }
+
+    /* ── ANIMATED HEADER RULE ── */
+    .header-rule {
+      height: 2px;
+      background: linear-gradient(90deg, var(--primary), var(--gold), var(--terracotta), var(--primary));
+      background-size: 300% 100%;
+      animation: rule-sweep 6s linear infinite;
+      position: sticky;
+      top: 72px;
+      z-index: 99;
+    }
+
+    @keyframes rule-sweep {
+      0%   { background-position: 0% 0%; }
+      100% { background-position: 300% 0%; }
     }
 
     .logo {
@@ -87,7 +119,7 @@
     }
 
     .logo-sub {
-      font-family: 'Inter', sans-serif;
+      font-family: var(--font-body);
       font-size: .62rem;
       font-weight: 600;
       letter-spacing: .16em;
@@ -103,7 +135,7 @@
     }
 
     .header-date {
-      font-family: 'Inter', sans-serif;
+      font-family: var(--font-body);
       font-size: .75rem;
       color: rgba(255, 255, 255, .70);
       font-weight: 500;
@@ -171,7 +203,7 @@
       gap: 5px;
       transition: background .15s;
       white-space: nowrap;
-      font-family: 'Inter', sans-serif;
+      font-family: var(--font-body);
     }
 
     .import-btn:hover {
@@ -192,7 +224,7 @@
       gap: 5px;
       transition: background .15s, transform .1s;
       white-space: nowrap;
-      font-family: 'Inter', sans-serif;
+      font-family: var(--font-body);
       letter-spacing: .01em;
     }
 
@@ -208,7 +240,15 @@
     @media (max-width: 560px) {
       header {
         padding: 0 14px;
-        height: 60px;
+        height: 62px;
+      }
+
+      .header-rule {
+        top: 62px;
+      }
+
+      nav {
+        top: 64px;
       }
 
       .header-date {
@@ -245,6 +285,9 @@
       background: var(--surface);
       border-bottom: 1.5px solid var(--border);
       display: flex;
+      position: sticky;
+      top: 74px;
+      z-index: 98;
     }
 
     .tab {
@@ -287,9 +330,14 @@
     }
 
     .view-title {
-      font-size: 1.05rem;
-      font-weight: 700;
+      font-family: var(--font-display);
+      font-size: 1.6rem;
+      font-weight: 600;
       color: var(--primary);
+      border-left: 3px solid var(--gold);
+      padding-left: 0.75rem;
+      letter-spacing: 0.01em;
+      line-height: 1.2;
     }
 
     .view-sub {
@@ -363,16 +411,21 @@
     }
 
     .stat-value {
-      font-family: 'Inter', -apple-system, sans-serif;
-      font-size: 1.9rem;
+      font-family: var(--font-display);
+      font-size: 2.2rem;
       font-weight: 700;
       color: var(--primary);
       line-height: 1;
-      letter-spacing: -.02em;
+      letter-spacing: -.01em;
     }
 
     .stat-card.stat-gold .stat-value {
+      font-size: 2.8rem;
       color: var(--gold);
+    }
+
+    .stat-card.stat-gold {
+      border-bottom: 2px solid var(--gold);
     }
 
     .stat-card.stat-terra .stat-value {
@@ -384,7 +437,7 @@
     }
 
     .stat-label {
-      font-family: 'Inter', sans-serif;
+      font-family: var(--font-body);
       font-size: .67rem;
       font-weight: 600;
       text-transform: uppercase;
@@ -470,6 +523,9 @@
       background: var(--primary);
       color: #fff;
       border-color: var(--primary);
+      transform: translateY(1px);
+      box-shadow: 2px 2px 0 var(--primary-dk);
+      font-weight: 600;
     }
 
     /* ── ORDERS ── */
@@ -500,21 +556,25 @@
       transform: translateY(0);
     }
 
-    /* left border colour by status */
+    /* left border colour by status + subtle background tint */
     .status-new {
       border-left-color: #5B9BD5;
+      background: linear-gradient(to right, rgba(91,155,213,0.04) 0%, transparent 60%);
     }
 
     .status-in-progress {
       border-left-color: var(--gold);
+      background: linear-gradient(to right, rgba(201,149,42,0.05) 0%, transparent 60%);
     }
 
     .status-ready {
       border-left-color: #4CAF50;
+      background: linear-gradient(to right, rgba(76,175,80,0.05) 0%, transparent 60%);
     }
 
     .status-delivered {
       border-left-color: #B0B0B0;
+      background: linear-gradient(to right, rgba(176,176,176,0.04) 0%, transparent 60%);
     }
 
     /* flagged — prominent terracotta left border */
@@ -546,9 +606,9 @@
     }
 
     .cust-name {
-      font-family: 'Playfair Display', Georgia, serif;
-      font-size: 1.05rem;
-      font-weight: 700;
+      font-family: var(--font-display);
+      font-size: 1.15rem;
+      font-weight: 600;
       color: var(--text);
       line-height: 1.25;
       letter-spacing: .005em;
@@ -575,7 +635,7 @@
       align-items: center;
       padding: 3px 9px;
       border-radius: 20px;
-      font-family: 'Inter', sans-serif;
+      font-family: var(--font-body);
       font-size: .63rem;
       font-weight: 700;
       letter-spacing: .06em;
@@ -638,7 +698,7 @@
       justify-content: space-between;
       gap: 10px;
       padding: 9px 16px 10px 14px;
-      border-top: 1px solid var(--border);
+      border-top: 1px solid rgba(123,31,46,0.08);
       background: rgba(0, 0, 0, .018);
     }
 
@@ -674,7 +734,7 @@
     }
 
     .card-total-price {
-      font-family: 'Playfair Display', Georgia, serif;
+      font-family: var(--font-display);
       font-size: 1rem;
       font-weight: 700;
       color: var(--primary);
@@ -682,7 +742,7 @@
     }
 
     .card-total-price .curr {
-      font-family: 'Inter', sans-serif;
+      font-family: var(--font-body);
       font-size: .67rem;
       font-weight: 600;
       color: var(--text-muted);
@@ -800,7 +860,7 @@
     }
 
     .ei-total .curr {
-      font-family: 'Inter', sans-serif;
+      font-family: var(--font-body);
       font-size: .62rem;
       font-weight: 600;
       color: var(--text-muted);
@@ -820,7 +880,7 @@
     }
 
     .expand-items-total .curr {
-      font-family: 'Inter', sans-serif;
+      font-family: var(--font-body);
       font-size: .65rem;
       font-weight: 600;
       color: var(--text-muted);
@@ -896,7 +956,7 @@
       background: none;
       border: none;
       padding: 3px 0;
-      font-family: 'Inter', sans-serif;
+      font-family: var(--font-body);
     }
 
     .expand-raw-toggle::before {
@@ -1038,7 +1098,7 @@
       font-weight: 700;
       cursor: pointer;
       border: 2px solid transparent;
-      font-family: 'Inter', sans-serif;
+      font-family: var(--font-body);
       transition: all .15s;
     }
 
@@ -1069,7 +1129,7 @@
       padding: 8px 10px;
       border: 1.5px solid var(--border);
       border-radius: var(--radius-sm);
-      font-family: 'Inter', sans-serif;
+      font-family: var(--font-body);
       font-size: .83rem;
       color: var(--text);
       background: var(--surface);
@@ -1104,7 +1164,7 @@
       border: 1.5px solid var(--border);
       background: transparent;
       color: var(--text-muted);
-      font-family: 'Inter', sans-serif;
+      font-family: var(--font-body);
       transition: background .12s, color .12s;
     }
 
@@ -1122,7 +1182,7 @@
       border: none;
       background: #FFF0EE;
       color: #C0392B;
-      font-family: 'Inter', sans-serif;
+      font-family: var(--font-body);
       transition: background .12s;
     }
 
@@ -1170,19 +1230,7 @@
       max-width: 540px;
       box-shadow: var(--shadow-lg);
       overflow: hidden;
-      animation: slide-in .18s ease;
-    }
-
-    @keyframes slide-in {
-      from {
-        opacity: 0;
-        transform: translateY(18px);
-      }
-
-      to {
-        opacity: 1;
-        transform: none;
-      }
+      animation: modal-scale .22s cubic-bezier(0.16, 1, 0.3, 1) both;
     }
 
     .modal-head {
@@ -1195,8 +1243,9 @@
     }
 
     .modal-head h2 {
-      font-size: 1.05rem;
-      font-weight: 700;
+      font-family: var(--font-display);
+      font-size: 1.25rem;
+      font-weight: 600;
     }
 
     .modal-close {
@@ -1694,7 +1743,7 @@
       border: none;
       background: transparent;
       color: var(--text-muted);
-      font-family: 'Inter', sans-serif;
+      font-family: var(--font-body);
       border-radius: 18px;
       transition: background .15s, color .15s;
       white-space: nowrap;
@@ -1731,7 +1780,8 @@
       justify-content: center;
       transition: background .15s, transform .12s, box-shadow .15s;
       line-height: 1;
-      font-family: 'Inter', sans-serif;
+      font-family: var(--font-body);
+      animation: fab-in 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) 0.3s both;
     }
 
     .fab:hover {
@@ -1802,7 +1852,7 @@
     }
 
     .sheet-head h2 {
-      font-family: 'Playfair Display', Georgia, serif;
+      font-family: var(--font-display);
       font-size: 1.05rem;
       font-weight: 700;
       color: var(--primary);
@@ -1889,7 +1939,7 @@
       border: none;
       background: var(--wa-green);
       color: #fff;
-      font-family: 'Inter', sans-serif;
+      font-family: var(--font-body);
       transition: background .1s;
       margin-top: 8px;
     }
@@ -1902,6 +1952,39 @@
       background: var(--border);
       color: var(--text-muted);
       cursor: not-allowed;
+    }
+
+    /* ── PAGE-LOAD ANIMATIONS ── */
+    @keyframes fade-up {
+      from { opacity: 0; transform: translateY(12px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    header  { animation: fade-up 0.4s ease both; }
+    .header-rule { animation: fade-up 0.42s 0.02s ease both; }
+    nav     { animation: fade-up 0.45s 0.05s ease both; }
+    main    { animation: fade-up 0.5s 0.1s ease both; }
+
+    /* ── CARD STAGGER ── */
+    .order-card { animation: fade-up 0.35s ease both; }
+    .order-card:nth-child(1) { animation-delay: 0.05s; }
+    .order-card:nth-child(2) { animation-delay: 0.10s; }
+    .order-card:nth-child(3) { animation-delay: 0.15s; }
+    .order-card:nth-child(4) { animation-delay: 0.20s; }
+    .order-card:nth-child(5) { animation-delay: 0.24s; }
+    .order-card:nth-child(6) { animation-delay: 0.27s; }
+    .order-card:nth-child(7) { animation-delay: 0.30s; }
+
+    /* ── FAB SPRING ENTRANCE ── */
+    @keyframes fab-in {
+      from { transform: scale(0) rotate(-45deg); opacity: 0; }
+      to   { transform: scale(1) rotate(0); opacity: 1; }
+    }
+
+    /* ── MODAL SCALE ENTRANCE ── */
+    @keyframes modal-scale {
+      from { transform: scale(0.94) translateY(8px); opacity: 0; }
+      to   { transform: scale(1) translateY(0); opacity: 1; }
     }
 
     /* ── ASYNC BUTTON STATES ── */
@@ -2445,6 +2528,7 @@
       </button>
     </div>
   </header>
+  <div class="header-rule"></div>
 
   <!-- ─── NAV TABS ─── -->
   <nav>
