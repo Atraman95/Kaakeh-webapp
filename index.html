@@ -537,7 +537,7 @@
 
     /* ── ORDER CARD ── */
     .order-card {
-      background: var(--surface);
+      background: var(--bg);
       border: 1.5px solid var(--border);
       border-left: 4px solid transparent;
       border-radius: var(--radius);
@@ -559,22 +559,22 @@
     /* left border colour by status + subtle background tint */
     .status-new {
       border-left-color: #5B9BD5;
-      background: linear-gradient(to right, rgba(91,155,213,0.04) 0%, transparent 60%);
+      background: linear-gradient(to right, rgba(91,155,213,0.08) 0%, rgba(91,155,213,0.03) 45%, var(--bg) 100%);
     }
 
     .status-in-progress {
       border-left-color: var(--gold);
-      background: linear-gradient(to right, rgba(201,149,42,0.05) 0%, transparent 60%);
+      background: linear-gradient(to right, rgba(201,149,42,0.10) 0%, rgba(201,149,42,0.04) 45%, var(--bg) 100%);
     }
 
     .status-ready {
       border-left-color: #4CAF50;
-      background: linear-gradient(to right, rgba(76,175,80,0.05) 0%, transparent 60%);
+      background: linear-gradient(to right, rgba(76,175,80,0.09) 0%, rgba(76,175,80,0.04) 45%, var(--bg) 100%);
     }
 
     .status-delivered {
       border-left-color: #B0B0B0;
-      background: linear-gradient(to right, rgba(176,176,176,0.04) 0%, transparent 60%);
+      background: linear-gradient(to right, rgba(176,176,176,0.09) 0%, rgba(176,176,176,0.04) 45%, var(--bg) 100%);
     }
 
     /* flagged — prominent terracotta left border */
@@ -2195,18 +2195,19 @@
     .cal-grid-cont {
       flex: 1;
       min-width: 0;
-      border-radius: 12px;
-      border: 1px solid var(--border);
-      background: var(--surface);
+      border-radius: 16px;
+      border: 1px solid rgba(123, 31, 46, 0.10);
+      background: linear-gradient(180deg, #fff 0%, #fcf8f2 100%);
       overflow: hidden;
       display: flex;
       flex-direction: column;
+      box-shadow: var(--shadow-sm);
     }
 
     .cal-weekdays {
       display: grid;
       grid-template-columns: repeat(7, 1fr);
-      border-bottom: 1px solid var(--border);
+      padding: 8px 10px 0;
     }
 
     .cal-weekdays div {
@@ -2223,6 +2224,8 @@
       display: grid;
       grid-template-columns: repeat(7, 1fr);
       flex: 1;
+      gap: 8px;
+      padding: 8px 10px 12px;
     }
 
     .cal-cell {
@@ -2232,12 +2235,12 @@
       flex-direction: column;
       align-items: flex-start;
       gap: 4px;
-      border-bottom: 1px solid var(--border);
-      border-right: 1px solid var(--border);
-      padding: 6px;
+      border: 1px solid rgba(123, 31, 46, 0.10);
+      border-radius: 10px;
+      padding: 8px;
       text-align: left;
-      transition: background-color 0.15s;
-      background: none;
+      transition: background-color 0.15s, border-color 0.15s, box-shadow 0.15s, transform 0.15s;
+      background: rgba(255, 255, 255, 0.75);
       cursor: pointer;
       color: var(--text);
     }
@@ -2250,21 +2253,22 @@
     }
 
     .cal-cell:hover {
-      background-color: rgba(0, 0, 0, 0.02);
-    }
-
-    .cal-cell:nth-child(7n) {
-      border-right: none;
+      background-color: #fff;
+      border-color: rgba(123, 31, 46, 0.25);
+      box-shadow: 0 4px 12px rgba(60, 20, 10, 0.08);
+      transform: translateY(-1px);
     }
 
     .cal-cell-muted {
-      background-color: rgba(0, 0, 0, 0.015);
+      background-color: rgba(250, 245, 238, 0.75);
       color: var(--text-muted);
+      border-color: rgba(123, 31, 46, 0.06);
     }
 
     .cal-cell-active {
-      background-color: rgba(123, 31, 46, 0.05);
-      box-shadow: inset 0 0 0 1px rgba(123, 31, 46, 0.2);
+      background-color: rgba(123, 31, 46, 0.08);
+      border-color: rgba(123, 31, 46, 0.42);
+      box-shadow: 0 0 0 2px rgba(123, 31, 46, 0.12);
     }
 
     .cal-date-num {
@@ -2382,9 +2386,10 @@
       width: 100%;
       display: flex;
       flex-direction: column;
-      border-radius: 12px;
-      border: 1px solid var(--border);
-      background: var(--surface);
+      border-radius: 16px;
+      border: 1px solid rgba(123, 31, 46, 0.10);
+      background: linear-gradient(180deg, #fff 0%, #fcf8f2 100%);
+      box-shadow: var(--shadow-sm);
     }
 
     @media (min-width: 1024px) {
@@ -2404,7 +2409,7 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
-      border-bottom: 1px solid var(--border);
+      border-bottom: 1px solid rgba(123, 31, 46, 0.10);
       padding: 12px 16px;
     }
 
@@ -2542,35 +2547,11 @@
   <main>
     <!-- TODAY VIEW -->
     <div id="view-today" class="view">
-      <div class="view-header">
-        <div class="view-title">Today's Deliveries</div>
-        <div class="view-sub" id="today-date-sub"></div>
-      </div>
-      <div class="stats-grid">
-        <div class="stat-card">
-          <div class="stat-value" id="stat-total">—</div>
-          <div class="stat-label">Orders Today</div>
-        </div>
-        <div class="stat-card stat-gold">
-          <div class="stat-value" id="stat-revenue">—</div>
-          <div class="stat-label">Revenue (AED)</div>
-        </div>
-        <div class="stat-card stat-terra">
-          <div class="stat-value" id="stat-unpaid">—</div>
-          <div class="stat-label">Unpaid Orders</div>
-        </div>
-      </div>
-      <div class="filters" id="today-filters"></div>
       <div class="orders-list" id="today-list"></div>
     </div>
 
     <!-- UPCOMING VIEW -->
     <div id="view-upcoming" class="view" style="display:none">
-      <div class="view-header">
-        <div class="view-title">Upcoming Orders</div>
-        <div class="view-sub">Future scheduled deliveries</div>
-      </div>
-      <div class="filters" id="upcoming-filters"></div>
       <div class="orders-list" id="upcoming-list"></div>
     </div>
 
@@ -2817,8 +2798,22 @@
     </div>
   </div>
 
+  <!-- ─── ORDER SUMMARY MODAL ─── -->
+  <div class="overlay" id="summary-overlay" onclick="onSummaryOverlayClick(event)">
+    <div class="modal">
+      <div class="modal-head">
+        <h2 id="summary-title">Order Summary</h2>
+        <button class="modal-close" onclick="closeSummaryModal()">✕</button>
+      </div>
+      <div class="modal-body" id="summary-body"></div>
+      <div class="modal-foot">
+        <button class="btn-cancel" onclick="closeSummaryModal()">Close</button>
+      </div>
+    </div>
+  </div>
+
   <!-- ─── FAB ─── -->
-  <button class="fab" onclick="openFab()" title="New Order">＋</button>
+  <button class="fab" onclick="openModal()" title="New Order">＋</button>
 
   <!-- ─── NEW ORDER SHEET ─── -->
   <div class="sheet-overlay" id="fab-overlay" onclick="onFabOverlayClick(event)">
@@ -3336,26 +3331,16 @@
     // TODAY
     function renderToday() {
       const today = todayStr();
-      document.getElementById('today-date-sub').textContent =
-        new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' });
       const all = orders.filter(o => o.deliveryDate === today);
-      const unpaid = all.filter(o => o.paymentStatus === 'unpaid').length;
-      const revenue = all.reduce((s, o) => s + orderTotal(o.items), 0);
-      const flagged = all.filter(o => o.requiresReview === 'yes').length;
-      document.getElementById('stat-total').textContent = all.length;
-      document.getElementById('stat-revenue').textContent = revenue.toFixed(0);
-      document.getElementById('stat-unpaid').textContent = unpaid;
-      buildFilterBar('today-filters');
-      const list = applyFilters(all).sort((a, b) => (a.deliveryTime || '').localeCompare(b.deliveryTime || ''));
+      const list = all.sort((a, b) => (a.deliveryTime || '').localeCompare(b.deliveryTime || ''));
       renderList('today-list', list, 'No deliveries scheduled for today.');
     }
 
     // UPCOMING
     function renderUpcoming() {
-      buildFilterBar('upcoming-filters');
       const today = todayStr();
       const all = orders.filter(o => o.deliveryDate > today);
-      const list = applyFilters(all).sort((a, b) => {
+      const list = all.sort((a, b) => {
         const dc = a.deliveryDate.localeCompare(b.deliveryDate);
         return dc !== 0 ? dc : (a.deliveryTime || '').localeCompare(b.deliveryTime || '');
       });
@@ -3593,7 +3578,7 @@
         if (itemsDesc.length > 50) itemsDesc = itemsDesc.substring(0, 47) + '...';
 
         html += `
-          <button class="cal-side-evt" onclick="openModal('${o.id}')">
+          <button class="cal-side-evt" onclick="openSummaryModal('${o.id}')">
             <div class="cal-evt-top">
               <div class="cal-evt-title">
                 <div class="cal-dot bg-${o.orderStatus}"></div>
@@ -3783,6 +3768,85 @@
     }
 
     function esc(s) { return (s || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;'); }
+
+    // ══════════════════════════════════════════════
+    //  ORDER SUMMARY MODAL
+    // ══════════════════════════════════════════════
+    function renderSummaryBody(o) {
+      const total = orderTotal(o.items);
+      const statusLabel = SL[o.orderStatus] || o.orderStatus;
+      const paymentLabel = o.paymentStatus === 'paid' ? 'Paid' : 'Unpaid';
+      const itemsHtml = o.items.length
+        ? o.items.map(i => {
+          const qty = parseInt(i.quantity) || 0;
+          const price = parseFloat(i.unitPrice) || 0;
+          const line = qty * price;
+          return `<div class="expand-item-row">
+            <span class="ei-name">${esc(i.name)}</span>
+            <span class="ei-qty">${qty} × AED ${price.toFixed(0)}</span>
+            <span class="ei-total"><span class="curr">AED</span>${line.toFixed(0)}</span>
+          </div>`;
+        }).join('')
+        : '<em style="opacity:.5;font-size:.83rem">No items</em>';
+
+      const whenLabel = o.deliveryTime
+        ? `${fmtDate(o.deliveryDate)} · ${fmtTime(o.deliveryTime)}`
+        : fmtDate(o.deliveryDate);
+
+      const rawHtml = o.rawMessageText
+        ? `<div class="expand-section">
+            <div class="expand-section-title">Raw Message</div>
+            <div class="expand-raw-body open">${esc(o.rawMessageText)}</div>
+          </div>`
+        : '';
+
+      return `
+        <div class="expand-section">
+          <div class="expand-section-title">Customer</div>
+          <div class="items-summary" style="margin-bottom:8px">${esc(o.customerName || 'Unnamed')}</div>
+          <div class="ei-qty">${esc(o.phone || 'No phone')}</div>
+          <div class="ei-qty">${esc(o.address || 'No address')}</div>
+        </div>
+        <div class="expand-section">
+          <div class="expand-section-title">Schedule</div>
+          <div class="ei-qty">${esc(whenLabel || 'Not set')}</div>
+        </div>
+        <div class="expand-section">
+          <div class="expand-section-title">Status</div>
+          <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+            <span class="badge ${SB[o.orderStatus] || 'badge-s-new'}">${statusLabel}</span>
+            <span class="badge ${o.paymentStatus === 'paid' ? 'badge-paid' : 'badge-unpaid'}">${paymentLabel}</span>
+          </div>
+        </div>
+        <div class="expand-section">
+          <div class="expand-section-title">Items</div>
+          ${itemsHtml}
+          <div class="expand-items-total">
+            <span>Order Total</span>
+            <span><span class="curr">AED</span>${total.toFixed(0)}</span>
+          </div>
+        </div>
+        ${o.paymentLink ? `<div class="expand-section">
+          <div class="expand-section-title">Payment Link</div>
+          <button class="plink-copy-btn-sm" onclick='copyPaymentLink(${JSON.stringify(o.paymentLink)},this)'>Copy Payment Link</button>
+        </div>` : ''}
+        ${rawHtml}
+      `;
+    }
+
+    function openSummaryModal(id) {
+      const o = orders.find(x => x.id === id);
+      if (!o) return;
+      document.getElementById('summary-title').textContent = `${o.customerName || 'Order'} Summary`;
+      document.getElementById('summary-body').innerHTML = renderSummaryBody(o);
+      document.getElementById('summary-overlay').classList.add('open');
+    }
+    function closeSummaryModal() {
+      document.getElementById('summary-overlay').classList.remove('open');
+    }
+    function onSummaryOverlayClick(e) {
+      if (e.target === document.getElementById('summary-overlay')) closeSummaryModal();
+    }
 
     // ══════════════════════════════════════════════
     //  ORDER FORM MODAL
