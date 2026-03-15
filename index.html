@@ -2871,31 +2871,6 @@
           <div class="form-row">
             <div class="fg"><label>Delivery Date *</label><input type="date" id="fab-date"></div>
             <div class="fg"><label>Delivery Time</label><input type="time" id="fab-time"></div>
-            <div class="fg">
-              <label>Delivery</label>
-              <select id="fab-delivery" onchange="fabRefreshTotal()">
-                <option value="no">No</option>
-                <option value="yes">Yes</option>
-              </select>
-            </div>
-          </div>
-          <div class="form-row">
-            <div class="fg">
-              <label>Order Status</label>
-              <select id="fab-order-status">
-                <option value="new">New</option>
-                <option value="in-progress">In Progress</option>
-                <option value="ready">Ready</option>
-                <option value="delivered">Delivered</option>
-              </select>
-            </div>
-            <div class="fg">
-              <label>Payment</label>
-              <select id="fab-payment">
-                <option value="unpaid">Unpaid</option>
-                <option value="paid">Paid</option>
-              </select>
-            </div>
           </div>
         </div>
 
@@ -4174,9 +4149,7 @@
       ['fab-name', 'fab-phone', 'fab-address', 'fab-date', 'fab-time'].forEach(id => {
         document.getElementById(id).value = '';
       });
-      document.getElementById('fab-order-status').value = 'new';
-      document.getElementById('fab-payment').value = 'unpaid';
-      document.getElementById('fab-delivery').value = 'no';
+
       document.getElementById('fab-items-container').innerHTML = '';
       document.getElementById('fab-paste').value = '';
       document.getElementById('fab-err').classList.remove('show');
@@ -4202,7 +4175,7 @@
       errEl.classList.remove('show');
       if (p.customerName) document.getElementById('fab-name').value = p.customerName;
       if (p.deliveryDate) document.getElementById('fab-date').value = p.deliveryDate;
-      document.getElementById('fab-delivery').value = p.deliveryFee > 0 ? 'yes' : 'no';
+
       document.getElementById('fab-items-container').innerHTML = '';
       if (p.items.length) p.items.forEach(i => fabAddItemRow(i));
       else fabAddItemRow();
@@ -4228,9 +4201,7 @@
         const qty = parseFloat(r.querySelector('.inp-qty').value) || 0;
         t += qty * skuUnitPrice(sku);
       });
-      if (document.getElementById('fab-delivery').value === 'yes') {
-        t += skuUnitPrice(skusById[DELIVERY_SKU_ID]);
-      }
+
       document.getElementById('fab-total-preview').textContent = `Order Total: ${t.toFixed(2)}`;
     }
     function fabCollectItems() {
@@ -4258,9 +4229,9 @@
         items,
         deliveryDate: date,
         deliveryTime: document.getElementById('fab-time').value,
-        delivery: document.getElementById('fab-delivery').value,
-        orderStatus: document.getElementById('fab-order-status').value,
-        paymentStatus: document.getElementById('fab-payment').value,
+        delivery: 'no',
+        orderStatus: 'new',
+        paymentStatus: 'unpaid',
       };
       const ok = await _upsertOrder(data, null);
       if (ok) {
