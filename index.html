@@ -2681,31 +2681,6 @@
           <div class="form-row">
             <div class="fg"><label>Delivery Date *</label><input type="date" id="f-date"></div>
             <div class="fg"><label>Delivery Time</label><input type="time" id="f-time"></div>
-            <div class="fg">
-              <label>Delivery</label>
-              <select id="f-delivery" onchange="refreshTotal()">
-                <option value="no">No</option>
-                <option value="yes">Yes</option>
-              </select>
-            </div>
-          </div>
-          <div class="form-row">
-            <div class="fg">
-              <label>Order Status</label>
-              <select id="f-order-status">
-                <option value="new">New</option>
-                <option value="in-progress">In Progress</option>
-                <option value="ready">Ready</option>
-                <option value="delivered">Delivered</option>
-              </select>
-            </div>
-            <div class="fg">
-              <label>Payment</label>
-              <select id="f-payment">
-                <option value="unpaid">Unpaid</option>
-                <option value="paid">Paid</option>
-              </select>
-            </div>
           </div>
         </div>
       </div>
@@ -3842,9 +3817,7 @@
 
     function resetForm() {
       ['f-name', 'f-phone', 'f-address', 'f-date', 'f-time'].forEach(id => document.getElementById(id).value = '');
-      document.getElementById('f-order-status').value = 'new';
-      document.getElementById('f-payment').value = 'unpaid';
-      document.getElementById('f-delivery').value = 'no';
+
       document.getElementById('items-container').innerHTML = '';
       refreshTotal();
     }
@@ -3854,9 +3827,7 @@
       document.getElementById('f-address').value = o.address || '';
       document.getElementById('f-date').value = o.deliveryDate || '';
       document.getElementById('f-time').value = o.deliveryTime || '';
-      document.getElementById('f-order-status').value = o.orderStatus;
-      document.getElementById('f-payment').value = o.paymentStatus;
-      document.getElementById('f-delivery').value = (o.address || '').trim() ? 'yes' : 'no';
+
       document.getElementById('items-container').innerHTML = '';
       o.items.forEach(addItemRow);
     }
@@ -3878,9 +3849,7 @@
         const qty = parseFloat(r.querySelector('.inp-qty').value) || 0;
         t += qty * skuUnitPrice(sku);
       });
-      if (document.getElementById('f-delivery').value === 'yes') {
-        t += skuUnitPrice(skusById[DELIVERY_SKU_ID]);
-      }
+
       document.getElementById('total-preview').textContent = `Order Total: ${t.toFixed(2)}`;
     }
     function collectItems() {
@@ -3908,9 +3877,9 @@
         items,
         deliveryDate: date,
         deliveryTime: document.getElementById('f-time').value,
-        delivery: document.getElementById('f-delivery').value,
-        orderStatus: document.getElementById('f-order-status').value,
-        paymentStatus: document.getElementById('f-payment').value,
+        delivery: 'no',
+        orderStatus: 'new',
+        paymentStatus: 'unpaid',
       };
       const result = await _upsertOrder(data, editId);
       if (result) {
