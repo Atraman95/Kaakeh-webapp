@@ -2030,7 +2030,6 @@
       display: flex;
       align-items: center;
       gap: 8px;
-      flex-wrap: wrap;
       background: #f0fdf4;
       border: 1px solid #86efac;
       border-radius: 8px;
@@ -2043,13 +2042,6 @@
       font-weight: 700;
       color: #16a34a;
       white-space: nowrap;
-    }
-
-    .plink-url {
-      flex: 1;
-      font-size: .7rem;
-      color: #374151;
-      word-break: break-all;
     }
 
     .plink-copy-btn {
@@ -2906,25 +2898,63 @@
       }
     }
 
-    function showPaymentLinkBanner(url) {
-      const saveBtn = document.getElementById('btn-save-order');
+    function buildOrderSummary(url, data) {
+      const itemLines = (data.items || []).map(i => {
+        let name, qty, lineTotal;
+        if (i.sku_id) {
+          const sku = skusById[i.sku_id];
+          name = sku?.name || i.sku_id;
+          qty = i.qty;
+          lineTotal = qty * skuUnitPrice(sku);
+        } else {
+          name = i.name;
+          qty = i.quantity;
+          lineTotal = qty * (parseFloat(i.unitPrice) || 0);
+        }
+        return `${qty} x ${name} — AED ${lineTotal.toFixed(2)}`;
+      }).join('\n');
+      const total = (data.items || []).reduce((sum, i) => {
+        if (i.sku_id) return sum + i.qty * skuUnitPrice(skusById[i.sku_id]);
+        return sum + i.quantity * (parseFloat(i.unitPrice) || 0);
+      }, 0);
+      const datePart = [data.deliveryDate, data.deliveryTime].filter(Boolean).join(' ');
+      const lines = [
+        'Kaakeh Order Summary',
+        `Customer: ${data.customerName}`,
+        data.phone    ? `Phone: ${data.phone}`       : null,
+        data.address  ? `Address: ${data.address}`   : null,
+        `Delivery: ${datePart}`,
+        '',
+        itemLines,
+        '',
+        `Total: AED ${total.toFixed(2)}`,
+        `Payment: ${url}`,
+      ].filter(l => l !== null).join('\n');
+      return lines;
+    }
+
+    function showPaymentLinkBanner(url, data, anchorBtn) {
+      const saveBtn = anchorBtn || document.getElementById('btn-save-order');
       if (!saveBtn) return;
       const old = saveBtn.parentElement.querySelector('.payment-link-banner');
       if (old) old.remove();
+      const summary = buildOrderSummary(url, data);
       const banner = document.createElement('div');
       banner.className = 'payment-link-banner';
-      banner.innerHTML = `
-    <span class="plink-label">Payment Link</span>
-    <button class="plink-copy-btn" onclick="copyPaymentLink('${url}',this)">Copy</button>`;
+      const btn = document.createElement('button');
+      btn.className = 'plink-copy-btn';
+      btn.textContent = 'Copy Summary';
+      btn.onclick = () => copyOrderSummary(summary, btn);
+      banner.append(btn);
       saveBtn.insertAdjacentElement('beforebegin', banner);
     }
 
-    function copyPaymentLink(url, btn) {
-      navigator.clipboard.writeText(url).then(() => {
+    function copyOrderSummary(text, btn) {
+      navigator.clipboard.writeText(text).then(() => {
         const orig = btn.textContent;
         btn.textContent = 'Copied!';
         setTimeout(() => { btn.textContent = orig; }, 2000);
-      }).catch(() => { prompt('Copy this link:', url); });
+      }).catch(() => { prompt('Copy this summary:', text); });
     }
 
     let expandedOrderId = null;
@@ -3177,7 +3207,7 @@
       return `${dt.getFullYear()}-${pad(dt.getMonth() + 1)}-${pad(dt.getDate())}`;
     }
     function orderTotal(items) {
-      return items.reduce((s, i) => s + (parseFloat(i.unitPrice) || 0) * (parseInt(i.quantity) || 0), 0);
+      return items.reduce((s, i) => s + (parseFloat(i.unitPrice) || 0) * (parseFloat(i.quantity) || 0), 0);
     }
 
     function skuUnitPrice(sku) {
@@ -3618,7 +3648,7 @@
       // Items rows
       const itemsHtml = o.items.length
         ? o.items.map(i => {
-          const qty = parseInt(i.quantity) || 0;
+          const qty = parseFloat(i.quantity) || 0;
           const price = parseFloat(i.unitPrice) || 0;
           const line = qty * price;
           return `<div class="expand-item-row">
@@ -3728,7 +3758,7 @@
       const paymentLabel = o.paymentStatus === 'paid' ? 'Paid' : 'Unpaid';
       const itemsHtml = o.items.length
         ? o.items.map(i => {
-          const qty = parseInt(i.quantity) || 0;
+          const qty = parseFloat(i.quantity) || 0;
           const price = parseFloat(i.unitPrice) || 0;
           const line = qty * price;
           return `<div class="expand-item-row">
@@ -3886,8 +3916,8 @@
         setBtnState(btn, 'success', editId ? 'Changes Saved!' : 'Order Saved!');
         await loadOrders();
         if (!editId && typeof result === 'string') {
-          showPaymentLinkBanner(result);
-          setTimeout(() => closeModal(), 4500);
+          showPaymentLinkBanner(result, data);
+          setTimeout(() => closeModal(), 7000);
         } else {
           setTimeout(() => closeModal(), 1500);
         }
@@ -4068,13 +4098,14 @@
       if (ok) {
         setBtnState(btn, 'success', 'Order Saved!');
         await loadOrders();
+        if (typeof ok === 'string') showPaymentLinkBanner(ok, data, btn);
         setTimeout(() => {
           closeImportModal();
           const t = todayStr();
           if (data.deliveryDate === t) switchTab('today');
           else if (data.deliveryDate > t) switchTab('upcoming');
           else switchTab('all');
-        }, 1500);
+        }, typeof ok === 'string' ? 7000 : 1500);
       } else {
         setBtnState(btn, 'idle');
       }
@@ -4206,13 +4237,14 @@
       if (ok) {
         setBtnState(btn, 'success', 'Order Saved!');
         await loadOrders();
+        if (typeof ok === 'string') showPaymentLinkBanner(ok, data, btn);
         setTimeout(() => {
           closeFab();
           const t = todayStr();
           if (data.deliveryDate === t) switchTab('today');
           else if (data.deliveryDate > t) switchTab('upcoming');
           else switchTab('all');
-        }, 1500);
+        }, typeof ok === 'string' ? 7000 : 1500);
       } else {
         setBtnState(btn, 'idle');
       }
