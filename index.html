@@ -2898,39 +2898,45 @@
       }
     }
 
-    function buildOrderSummary(url, data) {
-      const itemLines = (data.items || []).map(i => {
+    function buildOrderSummary(order, url) {
+      const link = url || order.paymentLink || '';
+      const itemLines = (order.items || []).map(i => {
         let name, qty, lineTotal;
-        if (i.sku_id) {
+        if (i.sku_id && !i.name) {
           const sku = skusById[i.sku_id];
           name = sku?.name || i.sku_id;
-          qty = i.qty;
+          qty = parseFloat(i.qty) || 0;
           lineTotal = qty * skuUnitPrice(sku);
         } else {
-          name = i.name;
-          qty = i.quantity;
+          name = i.name || i.sku_id || '';
+          qty = parseFloat(i.qty ?? i.quantity) || 0;
           lineTotal = qty * (parseFloat(i.unitPrice) || 0);
         }
         return `${qty} x ${name} — AED ${lineTotal.toFixed(2)}`;
       }).join('\n');
-      const total = (data.items || []).reduce((sum, i) => {
-        if (i.sku_id) return sum + i.qty * skuUnitPrice(skusById[i.sku_id]);
-        return sum + i.quantity * (parseFloat(i.unitPrice) || 0);
+      const total = (order.items || []).reduce((sum, i) => {
+        if (i.sku_id && !i.name) return sum + (parseFloat(i.qty) || 0) * skuUnitPrice(skusById[i.sku_id]);
+        return sum + (parseFloat(i.qty ?? i.quantity) || 0) * (parseFloat(i.unitPrice) || 0);
       }, 0);
-      const datePart = [data.deliveryDate, data.deliveryTime].filter(Boolean).join(' ');
-      const lines = [
+      const datePart = [order.deliveryDate, order.deliveryTime].filter(Boolean).join(' ');
+      return [
         'Kaakeh Order Summary',
-        `Customer: ${data.customerName}`,
-        data.phone    ? `Phone: ${data.phone}`       : null,
-        data.address  ? `Address: ${data.address}`   : null,
+        `Customer: ${order.customerName}`,
+        order.phone   ? `Phone: ${order.phone}`     : null,
+        order.address ? `Address: ${order.address}` : null,
         `Delivery: ${datePart}`,
         '',
         itemLines,
         '',
         `Total: AED ${total.toFixed(2)}`,
-        `Payment: ${url}`,
+        link          ? `Payment: ${link}`          : null,
       ].filter(l => l !== null).join('\n');
-      return lines;
+    }
+
+    function copyCardSummary(id, btn) {
+      const o = orders.find(x => x.id === id);
+      if (!o) return;
+      copyOrderSummary(buildOrderSummary(o), btn);
     }
 
     function showPaymentLinkBanner(url, data, anchorBtn) {
@@ -2938,7 +2944,7 @@
       if (!saveBtn) return;
       const old = saveBtn.parentElement.querySelector('.payment-link-banner');
       if (old) old.remove();
-      const summary = buildOrderSummary(url, data);
+      const summary = buildOrderSummary(data, url);
       const banner = document.createElement('div');
       banner.className = 'payment-link-banner';
       const btn = document.createElement('button');
@@ -3727,8 +3733,8 @@
       ${o.paymentLink ? `
         <div class="plink-row">
           <button class="plink-copy-btn-sm"
-                  onclick="event.stopPropagation();copyPaymentLink('${esc(o.paymentLink)}',this)">
-            Copy Payment Link
+                  onclick="event.stopPropagation();copyCardSummary('${esc(o.id)}',this)">
+            Copy Order Summary
           </button>
         </div>` : ''}
     </div>
@@ -3808,7 +3814,7 @@
         </div>
         ${o.paymentLink ? `<div class="expand-section">
           <div class="expand-section-title">Payment Link</div>
-          <button class="plink-copy-btn-sm" onclick='copyPaymentLink(${JSON.stringify(o.paymentLink)},this)'>Copy Payment Link</button>
+          <button class="plink-copy-btn-sm" onclick='copyCardSummary(${JSON.stringify(o.id)},this)'>Copy Order Summary</button>
         </div>` : ''}
         ${rawHtml}
       `;
