@@ -3045,11 +3045,6 @@
     //  MUTATIONS
     // ══════════════════════════════════════════════
     async function _upsertOrder(data, existingId) {
-      if (existingId) {
-        alert('Editing existing orders is not supported by create-order yet.');
-        return false;
-      }
-
       const items = (data.items || []).map(i => {
         const sku_id = i.sku_id || findSkuIdByName(i.name);
         const qty = parseFloat(i.qty ?? i.quantity) || 0;
@@ -3062,6 +3057,7 @@
       }
 
       const payload = {
+        ...(existingId ? { order_id: existingId } : {}),
         customer_name: data.customerName,
         phone: data.phone || '',
         address: data.address || '',

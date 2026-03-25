@@ -154,8 +154,6 @@ serve(async (req) => {
     // Stripe Checkout Session — CREATE mode only
     let payment_link: string | null = null
     if (!order_id) {
-      const successUrl = Deno.env.get("STRIPE_SUCCESS_URL") || "https://maoyacaiwerynhvhonai.supabase.co"
-      const cancelUrl  = Deno.env.get("STRIPE_CANCEL_URL")  || successUrl
       const session = await stripe.checkout.sessions.create({
         payment_method_types: ["card"],
         line_items: [{
@@ -167,8 +165,8 @@ serve(async (req) => {
           quantity: 1,
         }],
         mode: "payment",
-        success_url: successUrl,
-        cancel_url: cancelUrl,
+        success_url: "https://stripe.com",
+        cancel_url: "https://stripe.com",
         metadata: { order_id: order.id, customer_name },
       })
       payment_link = session.url
