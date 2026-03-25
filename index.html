@@ -2918,7 +2918,7 @@
         if (i.sku_id && !i.name) return sum + (parseFloat(i.qty) || 0) * skuUnitPrice(skusById[i.sku_id]);
         return sum + (parseFloat(i.qty ?? i.quantity) || 0) * (parseFloat(i.unitPrice) || 0);
       }, 0);
-      const datePart = [order.deliveryDate, order.deliveryTime].filter(Boolean).join(' ');
+      const datePart = [order.deliveryDate, order.deliveryTime ? fmtTime(order.deliveryTime) : null].filter(Boolean).join(' ');
       return [
         'Kaakeh Order Summary',
         `Customer: ${order.customerName}`,

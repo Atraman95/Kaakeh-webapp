@@ -113,7 +113,10 @@ serve(async (req) => {
           ? sku.price / sku.base_quantity
           : sku.price
 
-      const line_total = unit_price * item.qty
+      const line_total =
+        sku.pricing_type === "per_pack"
+          ? (sku.price / sku.base_quantity) * item.qty
+          : sku.price * item.qty
       subtotal += line_total
 
       orderItems.push({
@@ -165,7 +168,7 @@ serve(async (req) => {
           quantity: 1,
         }],
         mode: "payment",
-        success_url: "https://stripe.com",
+        success_url: "https://atraman95.github.io/thank-you.html",
         cancel_url: "https://stripe.com",
         metadata: { order_id: order.id, customer_name },
       })
