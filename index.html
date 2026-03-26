@@ -613,6 +613,14 @@
       line-height: 1.25;
       letter-spacing: .005em;
     }
+    .cust-meta {
+      font-size: .78rem;
+      color: var(--text-muted, #888);
+      margin-top: 1px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
 
     .items-summary {
       font-size: .8rem;
@@ -3620,6 +3628,8 @@
         <span class="badge ${SB[o.orderStatus] || 'badge-s-new'}">${SL[o.orderStatus] || o.orderStatus}</span>
       </div>
       <div class="cust-name">${esc(o.customerName)}</div>
+      ${o.phone ? `<div class="cust-meta">${esc(o.phone)}</div>` : ''}
+      ${o.address ? `<div class="cust-meta">${esc(o.address)}</div>` : ''}
       <div class="items-summary">${buildItemsSummary(o.items)}</div>
     </div>
     <div class="card-footer">
@@ -3654,8 +3664,8 @@
           const price = parseFloat(i.unitPrice) || 0;
           const line = qty * price;
           return `<div class="expand-item-row">
-          <span class="ei-name">${esc(i.name)}</span>
-          <span class="ei-qty">${qty} × AED ${price.toFixed(0)}</span>
+          <span class="ei-name"><span class="item-qty">${qty}×</span> ${esc(i.name)}</span>
+          <span class="ei-qty">AED ${price.toFixed(0)} each</span>
           <span class="ei-total"><span class="curr">AED</span>${line.toFixed(0)}</span>
         </div>`;
         }).join('')
