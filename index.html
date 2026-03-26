@@ -3665,7 +3665,7 @@
           const line = qty * price;
           return `<div class="expand-item-row">
           <span class="ei-name"><span class="item-qty">${qty}×</span> ${esc(i.name)}</span>
-          <span class="ei-qty">AED ${price.toFixed(0)} each</span>
+          <span class="ei-qty">AED ${price.toFixed(2)} each</span>
           <span class="ei-total"><span class="curr">AED</span>${line.toFixed(0)}</span>
         </div>`;
         }).join('')
