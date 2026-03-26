@@ -3098,6 +3098,44 @@
       }
     }
 
+    async function regeneratePaymentLink(orderId, btn) {
+      const o = orders.find(x => x.id === orderId);
+      if (!o) return;
+      const origHtml = btn.innerHTML;
+      btn.disabled = true;
+      btn.innerHTML = '↻ Regenerating…';
+      const items = o.items
+        .filter(i => i.sku_id)
+        .map(i => ({ sku_id: i.sku_id, qty: parseFloat(i.quantity) || 0 }))
+        .filter(i => i.qty > 0);
+      try {
+        const res = await fetch(`${SUPABASE_URL}/functions/v1/create-order`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', apikey: SUPABASE_KEY, Authorization: `Bearer ${SUPABASE_KEY}` },
+          body: JSON.stringify({
+            order_id: orderId,
+            regenerate_payment_link: true,
+            customer_name: o.customerName,
+            phone: o.phone || '',
+            address: o.address || '',
+            delivery_date: o.deliveryDate,
+            delivery_time: o.deliveryTime || '',
+            delivery: 'no',
+            items,
+          }),
+        });
+        const body = await res.json().catch(() => ({}));
+        if (!res.ok) { alert('Failed: ' + (body.error || `HTTP ${res.status}`)); btn.disabled = false; btn.innerHTML = origHtml; return; }
+        if (body.payment_link) { o.paymentLink = body.payment_link; render(); }
+        btn.innerHTML = '✓ Done';
+        setTimeout(() => { btn.disabled = false; btn.innerHTML = origHtml; }, 2000);
+      } catch (err) {
+        alert('Failed: ' + (err?.message || String(err)));
+        btn.disabled = false;
+        btn.innerHTML = origHtml;
+      }
+    }
+
     async function quickStatus(id, val, stepEl) {
       // Disable the whole stepper row immediately (synchronous) to prevent double-tap
       const stepper = stepEl?.closest('.stepper');
@@ -3752,6 +3790,8 @@
       <div class="expand-actions">
         <button class="btn-edit-order"
                 onclick="event.stopPropagation();openModal('${o.id}')">✎ Edit Order</button>
+        <button class="btn-edit-order"
+                onclick="event.stopPropagation();regeneratePaymentLink('${o.id}',this)">↻ New Payment Link</button>
         <button class="btn-delete-order"
                 onclick="event.stopPropagation();deleteOrder('${o.id}',this)">🗑 Delete</button>
       </div>

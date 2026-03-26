@@ -34,7 +34,8 @@ serve(async (req) => {
       delivery_date,
       delivery_time,
       delivery,
-      items
+      items,
+      regenerate_payment_link,
     } = body
 
     if (!customer_name || !items || items.length === 0) {
@@ -154,9 +155,9 @@ serve(async (req) => {
       if (itemsError) throw itemsError
     }
 
-    // Stripe Checkout Session — CREATE mode only
+    // Stripe Checkout Session — CREATE mode, or on explicit regeneration
     let payment_link: string | null = null
-    if (!order_id) {
+    if (!order_id || regenerate_payment_link) {
       const session = await stripe.checkout.sessions.create({
         payment_method_types: ["card"],
         line_items: [{
@@ -168,7 +169,7 @@ serve(async (req) => {
           quantity: 1,
         }],
         mode: "payment",
-        success_url: "https://atraman95.github.io/thank-you.html",
+        success_url: "https://atraman95.github.io/Kaakeh-webapp/thank-you.html",
         cancel_url: "https://stripe.com",
         metadata: { order_id: order.id, customer_name },
       })
