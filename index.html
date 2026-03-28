@@ -1154,6 +1154,21 @@
     .notes-textarea::placeholder {
       color: var(--text-muted);
     }
+    .notes-save-btn {
+      margin-top: 6px;
+      padding: 6px 14px;
+      border-radius: var(--radius-sm);
+      border: 1.5px solid var(--border);
+      background: var(--surface);
+      font-family: var(--font-body);
+      font-size: .8rem;
+      font-weight: 600;
+      color: var(--text);
+      cursor: pointer;
+      transition: background .12s, border-color .12s;
+    }
+    .notes-save-btn:hover { background: var(--border); }
+    .notes-save-btn.saved { border-color: var(--gold); color: var(--gold); }
 
     /* bottom action row */
     .expand-actions {
@@ -2993,6 +3008,7 @@
         statedTotal: row.stated_total ? parseFloat(row.stated_total) : null,
         rawMessageText: row.raw_message_text || '',
         paymentLink: row.payment_link || null,
+        notes: row.notes || '',
         items: itemRows.map(i => ({
           name: i.product_name || i.name || '',
           quantity: i.qty ?? i.quantity ?? 0,
@@ -3031,6 +3047,7 @@
       orders = orderRows.map(row =>
         dbToOrder(row, (itemRows || []).filter(i => i.order_id === row.id))
       );
+      orders.forEach(o => { if (o.notes && !_notesMap[o.id]) _notesMap[o.id] = o.notes; });
       render();
     }
 
@@ -3096,6 +3113,25 @@
         alert('Save failed: ' + (err?.message || String(err)));
         return false;
       }
+    }
+
+    async function saveNote(orderId, btn) {
+      const note = _notesMap[orderId] || '';
+      const origHtml = btn.innerHTML;
+      btn.disabled = true;
+      btn.innerHTML = 'Saving…';
+      const { error } = await db.from('orders').update({ notes: note }).eq('id', orderId);
+      if (error) {
+        alert('Failed to save note: ' + error.message);
+        btn.disabled = false;
+        btn.innerHTML = origHtml;
+        return;
+      }
+      const o = orders.find(x => x.id === orderId);
+      if (o) o.notes = note;
+      btn.classList.add('saved');
+      btn.innerHTML = '✓ Saved';
+      setTimeout(() => { btn.disabled = false; btn.classList.remove('saved'); btn.innerHTML = origHtml; }, 2000);
     }
 
     async function regeneratePaymentLink(orderId, btn) {
@@ -3750,10 +3786,11 @@
 
       // Notes (in-memory)
       const notes = _notesMap[o.id] || '';
-      const notesHtml = `<textarea class="notes-textarea"
+      const notesHtml = `<textarea class="notes-textarea" id="notes-ta-${o.id}"
     placeholder="Add internal notes…"
     oninput="_notesMap['${o.id}']=this.value"
-    onclick="event.stopPropagation()">${esc(notes)}</textarea>`;
+    onclick="event.stopPropagation()">${esc(notes)}</textarea>
+    <button class="notes-save-btn" onclick="event.stopPropagation();saveNote('${o.id}',this)">Save Note</button>`;
 
       return `
   <div class="card-expanded" onclick="event.stopPropagation()">
