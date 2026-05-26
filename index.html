@@ -1777,6 +1777,92 @@
       color: #fff;
     }
 
+    /* ── PREP TOTALS VIEW ── */
+    .prep-view-toggle {
+      margin-bottom: 14px;
+    }
+
+    .prep-row {
+      background: var(--surface);
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow-sm);
+      overflow: hidden;
+      cursor: pointer;
+      transition: box-shadow .12s;
+    }
+
+    .prep-row:hover {
+      box-shadow: var(--shadow-md);
+    }
+
+    .prep-row-head {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 13px 16px;
+    }
+
+    .prep-row-name {
+      font-weight: 600;
+      font-size: .93rem;
+      color: var(--text);
+      flex: 1;
+      min-width: 0;
+    }
+
+    .prep-row-meta {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-shrink: 0;
+    }
+
+    .prep-qty-badge {
+      font-family: var(--font-display);
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--primary);
+      line-height: 1;
+    }
+
+    .prep-order-count {
+      font-size: .72rem;
+      color: var(--text-muted);
+      font-weight: 500;
+      white-space: nowrap;
+    }
+
+    .prep-breakdown {
+      border-top: 1px solid var(--border);
+      background: var(--bg);
+      animation: expand-in .15s ease;
+    }
+
+    .prep-breakdown-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 7px 16px;
+      font-size: .82rem;
+      color: var(--text-md);
+    }
+
+    .prep-breakdown-row + .prep-breakdown-row {
+      border-top: 1px solid rgba(0, 0, 0, .04);
+    }
+
+    .prep-bd-name {
+      font-weight: 500;
+      color: var(--text);
+    }
+
+    .prep-bd-qty {
+      font-weight: 700;
+      color: var(--primary);
+      white-space: nowrap;
+    }
+
     /* extra bottom padding so FAB doesn't overlap last card */
     main {
       padding-bottom: 90px;
@@ -2562,11 +2648,13 @@
   <main>
     <!-- TODAY VIEW -->
     <div id="view-today" class="view">
+      <div id="today-toggle-wrap"></div>
       <div class="orders-list" id="today-list"></div>
     </div>
 
     <!-- UPCOMING VIEW -->
     <div id="view-upcoming" class="view" style="display:none">
+      <div id="upcoming-toggle-wrap"></div>
       <div class="orders-list" id="upcoming-list"></div>
     </div>
 
@@ -2899,6 +2987,8 @@
     let filterDate = 'all';   // 'today' | 'all'   (All Orders tab date toggle)
     let filterStatus = 'all';   // 'all' | 'new' | 'in-progress' | 'ready' | 'delivered'
     let filterPayment = 'all';   // 'all' | 'paid' | 'unpaid'
+    const prepView = { today: false, upcoming: false };
+    const prepExpanded = { today: null, upcoming: null };
     let skus = [];
     const skusById = {};
     const DELIVERY_SKU_ID = '76f384c5-d815-4d14-90ce-ea3dfbaf5bec';
@@ -3396,6 +3486,8 @@
     function renderToday() {
       const today = todayStr();
       const all = orders.filter(o => o.deliveryDate === today);
+      document.getElementById('today-toggle-wrap').innerHTML = prepToggleHTML('today');
+      if (prepView.today) { renderPrepTotals('today', all, 'today-list'); return; }
       const list = all.sort((a, b) => (a.deliveryTime || '').localeCompare(b.deliveryTime || ''));
       renderList('today-list', list, 'No deliveries scheduled for today.');
     }
@@ -3404,6 +3496,8 @@
     function renderUpcoming() {
       const today = todayStr();
       const all = orders.filter(o => o.deliveryDate > today);
+      document.getElementById('upcoming-toggle-wrap').innerHTML = prepToggleHTML('upcoming');
+      if (prepView.upcoming) { renderPrepTotals('upcoming', all, 'upcoming-list'); return; }
       const list = all.sort((a, b) => {
         const dc = a.deliveryDate.localeCompare(b.deliveryDate);
         return dc !== 0 ? dc : (a.deliveryTime || '').localeCompare(b.deliveryTime || '');
@@ -3420,6 +3514,85 @@
         html += groups[date].map(renderCard).join('');
       });
       document.getElementById('upcoming-list').innerHTML = html;
+    }
+
+    // PREP TOTALS
+    function prepToggleHTML(scope) {
+      return `<div class="filter-pill prep-view-toggle">` +
+        `<button class="filter-pill-btn${!prepView[scope] ? ' active' : ''}" onclick="setPrepView('${scope}',false)">Orders</button>` +
+        `<button class="filter-pill-btn${prepView[scope] ? ' active' : ''}" onclick="setPrepView('${scope}',true)">Prep Totals</button>` +
+        `</div>`;
+    }
+
+    function setPrepView(scope, val) {
+      prepView[scope] = val;
+      prepExpanded[scope] = null;
+      render();
+    }
+
+    function togglePrepRow(scope, key) {
+      prepExpanded[scope] = prepExpanded[scope] === key ? null : key;
+      render();
+    }
+
+    function renderPrepTotals(scope, orderList, containerId) {
+      if (!orderList.length) {
+        const msg = scope === 'today' ? 'No deliveries scheduled for today.' : 'No upcoming orders';
+        document.getElementById(containerId).innerHTML =
+          `<div class="empty"><div class="empty-icon"><svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" opacity=".35"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></div><p>${msg}</p></div>`;
+        return;
+      }
+      if (scope === 'upcoming') {
+        const groups = {};
+        orderList.forEach(o => { if (!groups[o.deliveryDate]) groups[o.deliveryDate] = []; groups[o.deliveryDate].push(o); });
+        let html = '';
+        Object.keys(groups).sort().forEach(date => {
+          html += `<div class="date-group-label">${dayLabel(date)}</div>`;
+          html += buildPrepRows(groups[date], scope, date);
+        });
+        document.getElementById(containerId).innerHTML = html;
+      } else {
+        document.getElementById(containerId).innerHTML = buildPrepRows(orderList, scope, '');
+      }
+    }
+
+    function buildPrepRows(orderList, scope, datePrefix) {
+      const map = {};
+      orderList.forEach(o => {
+        (o.items || []).forEach(i => {
+          const key = i.sku_id || i.name || '?';
+          const displayName = i.sku_id
+            ? (skusById[i.sku_id]?.name || i.name || i.sku_id)
+            : (i.name || '?');
+          const qty = parseFloat(i.qty ?? i.quantity) || 0;
+          if (!map[key]) map[key] = { name: displayName, totalQty: 0, byOrder: {} };
+          map[key].totalQty += qty;
+          if (!map[key].byOrder[o.id]) map[key].byOrder[o.id] = { customerName: o.customerName || 'Unnamed', qty: 0 };
+          map[key].byOrder[o.id].qty += qty;
+        });
+      });
+
+      const rows = Object.entries(map).sort((a, b) => b[1].totalQty - a[1].totalQty);
+      if (!rows.length) return '';
+
+      const fmtQty = q => Number.isInteger(q) ? String(q) : q.toFixed(1);
+
+      return rows.map(([key, data]) => {
+        const expandKey = datePrefix ? `${datePrefix}::${key}` : key;
+        const isExpanded = prepExpanded[scope] === expandKey;
+        const breakdown = Object.values(data.byOrder).sort((a, b) => b.qty - a.qty || a.customerName.localeCompare(b.customerName));
+        const orderCountLabel = breakdown.length === 1 ? '1 order' : `${breakdown.length} orders`;
+        const breakdownHTML = isExpanded
+          ? `<div class="prep-breakdown">${breakdown.map(b =>
+              `<div class="prep-breakdown-row"><span class="prep-bd-name">${esc(b.customerName)}</span><span class="prep-bd-qty">${fmtQty(b.qty)}</span></div>`
+            ).join('')}</div>`
+          : '';
+        return `<div class="prep-row${isExpanded ? ' expanded' : ''}" data-prepscope="${esc(scope)}" data-prepkey="${esc(expandKey)}" onclick="togglePrepRow(this.dataset.prepscope,this.dataset.prepkey)">` +
+          `<div class="prep-row-head">` +
+          `<span class="prep-row-name">${esc(data.name)}</span>` +
+          `<span class="prep-row-meta"><span class="prep-order-count">${orderCountLabel}</span><span class="prep-qty-badge">${fmtQty(data.totalQty)}</span><span class="expand-chevron">▾</span></span>` +
+          `</div>${breakdownHTML}</div>`;
+      }).join('');
     }
 
     // ALL
