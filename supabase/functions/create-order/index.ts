@@ -33,6 +33,7 @@ serve(async (req) => {
       address,
       delivery_date,
       delivery_time,
+      notes,
       delivery,
       items,
       regenerate_payment_link,
@@ -66,7 +67,8 @@ serve(async (req) => {
           phone,
           address,
           delivery_date,
-          delivery_time
+          delivery_time,
+          notes: notes ?? null,
         })
         .eq("id", order_id)
         .select()
@@ -92,6 +94,7 @@ serve(async (req) => {
           address,
           delivery_date,
           delivery_time,
+          notes: notes ?? null,
           order_status: "new",
           payment_status: "unpaid"
         })

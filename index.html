@@ -2786,6 +2786,10 @@
             <div class="fg"><label>Delivery Time</label><input type="time" id="f-time"></div>
           </div>
         </div>
+        <div class="section">
+          <div class="section-label">Notes</div>
+          <textarea class="notes-textarea" id="f-notes" placeholder="Internal notes…" style="min-height:60px"></textarea>
+        </div>
       </div>
       <div class="modal-foot">
         <button class="btn-cancel" onclick="closeModal()">Cancel</button>
@@ -3178,6 +3182,7 @@
         address: data.address || '',
         delivery_date: data.deliveryDate,
         delivery_time: data.deliveryTime || '',
+        notes: data.notes || '',
         delivery: data.delivery || 'no',
         items,
       };
@@ -3198,6 +3203,16 @@
           alert('Save failed: ' + (body.error || `HTTP ${res.status}`));
           return false;
         }
+
+        // Persist notes directly via the client so it works regardless of
+        // whether the create-order Edge Function has been redeployed.
+        const savedId = body.order_id || existingId;
+        if (savedId) {
+          const note = data.notes || '';
+          await db.from('orders').update({ notes: note }).eq('id', savedId);
+          _notesMap[savedId] = note;
+        }
+
         return body.payment_link || true;
       } catch (err) {
         alert('Save failed: ' + (err?.message || String(err)));
@@ -4108,7 +4123,7 @@
     function onOverlayClick(e) { if (e.target === document.getElementById('overlay')) closeModal(); }
 
     function resetForm() {
-      ['f-name', 'f-phone', 'f-address', 'f-date', 'f-time'].forEach(id => document.getElementById(id).value = '');
+      ['f-name', 'f-phone', 'f-address', 'f-date', 'f-time', 'f-notes'].forEach(id => document.getElementById(id).value = '');
 
       document.getElementById('items-container').innerHTML = '';
       refreshTotal();
@@ -4169,6 +4184,7 @@
         items,
         deliveryDate: date,
         deliveryTime: document.getElementById('f-time').value,
+        notes: document.getElementById('f-notes').value.trim(),
         delivery: 'no',
         orderStatus: 'new',
         paymentStatus: 'unpaid',
@@ -4491,6 +4507,7 @@
         items,
         deliveryDate: date,
         deliveryTime: document.getElementById('fab-time').value,
+        notes: document.getElementById('fab-notes').value.trim(),
         delivery: 'no',
         orderStatus: 'new',
         paymentStatus: 'unpaid',
