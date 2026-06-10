@@ -3017,24 +3017,26 @@
 
     function buildOrderSummary(order, url) {
       const link = url || order.paymentLink || '';
-      const itemLines = (order.items || []).map(i => {
-        let name, qty, lineTotal;
+      const lines = (order.items || []).map(i => {
+        let name, qty, unit;
         if (i.sku_id && !i.name) {
           const sku = skusById[i.sku_id];
           name = sku?.name || i.sku_id;
           qty = parseFloat(i.qty) || 0;
-          lineTotal = qty * skuUnitPrice(sku);
+          unit = skuUnitPrice(sku);
         } else {
           name = i.name || i.sku_id || '';
           qty = parseFloat(i.qty ?? i.quantity) || 0;
-          lineTotal = qty * (parseFloat(i.unitPrice) || 0);
+          unit = parseFloat(i.unitPrice) || 0;
+          // Imported items may carry a name the parser couldn't price — fall back
+          // to SKU pricing so the summary total matches the server-computed total.
+          if (!unit) unit = skuUnitPrice(skusById[i.sku_id] || skusById[findSkuIdByName(name)]);
         }
-        return `${qty} x ${name} — AED ${lineTotal.toFixed(2)}`;
-      }).join('\n');
-      const total = (order.items || []).reduce((sum, i) => {
-        if (i.sku_id && !i.name) return sum + (parseFloat(i.qty) || 0) * skuUnitPrice(skusById[i.sku_id]);
-        return sum + (parseFloat(i.qty ?? i.quantity) || 0) * (parseFloat(i.unitPrice) || 0);
-      }, 0);
+        const lineTotal = qty * unit;
+        return { text: `${qty} x ${name} — AED ${lineTotal.toFixed(2)}`, lineTotal };
+      });
+      const itemLines = lines.map(l => l.text).join('\n');
+      const total = lines.reduce((sum, l) => sum + l.lineTotal, 0);
       const datePart = [order.deliveryDate, order.deliveryTime ? fmtTime(order.deliveryTime) : null].filter(Boolean).join(' ');
       return [
         'Kaakeh Order Summary',
@@ -3128,11 +3130,19 @@
     // ══════════════════════════════════════════════
     //  DATA LOADING
     // ══════════════════════════════════════════════
+    let _loadSeq = 0;
     async function loadOrders() {
+      // Guard against overlapping/out-of-order reloads. The save flow's explicit
+      // loadOrders() and the debounced realtime reloads run concurrently; without
+      // this, a stale partial snapshot (orders committed, order_items not yet) can
+      // resolve after a complete one and overwrite it, leaving an order with 0 or
+      // partial items. Only the most-recently-started load may apply its result.
+      const seq = ++_loadSeq;
       const [{ data: orderRows, error: ordErr }, { data: itemRows, error: itemErr }] = await Promise.all([
         db.from('orders').select('*').order('created_at', { ascending: false }),
         db.from('order_items').select('*'),
       ]);
+      if (seq !== _loadSeq) return;   // a newer load started — discard this snapshot
       if (ordErr || itemErr) {
         console.error('Load error:', ordErr || itemErr);
         setSyncStatus('error');
