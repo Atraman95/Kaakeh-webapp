@@ -3132,24 +3132,40 @@
     // ══════════════════════════════════════════════
     let _loadSeq = 0;
     async function loadOrders() {
-      // Guard against overlapping/out-of-order reloads. The save flow's explicit
-      // loadOrders() and the debounced realtime reloads run concurrently; without
-      // this, a stale partial snapshot (orders committed, order_items not yet) can
-      // resolve after a complete one and overwrite it, leaving an order with 0 or
-      // partial items. Only the most-recently-started load may apply its result.
+      // Embed order_items directly in the orders query (single atomic read).
+      // A separate unbounded `order_items.select('*')` hits PostgREST's default
+      // 1000-row cap once the table grows past it, silently dropping the newest
+      // item rows — so recently created/paid orders showed 0 or partial items.
+      // Embedding caps at the top-level (orders) instead, and reads items
+      // consistently with their order in one round trip (no read-straddle race).
+      //
+      // The sequence guard still protects against overlapping reloads (the save
+      // flow's explicit loadOrders() racing a debounced realtime reload): only
+      // the most-recently-started load may apply its result.
+      //
+      // The top-level orders query is itself subject to the 1000-row cap, so we
+      // page through it with .range() until a short page signals the end. This
+      // keeps every order (and its embedded items) regardless of table size.
       const seq = ++_loadSeq;
-      const [{ data: orderRows, error: ordErr }, { data: itemRows, error: itemErr }] = await Promise.all([
-        db.from('orders').select('*').order('created_at', { ascending: false }),
-        db.from('order_items').select('*'),
-      ]);
-      if (seq !== _loadSeq) return;   // a newer load started — discard this snapshot
-      if (ordErr || itemErr) {
-        console.error('Load error:', ordErr || itemErr);
-        setSyncStatus('error');
-        return;
+      const PAGE = 1000;
+      const orderRows = [];
+      for (let from = 0; ; from += PAGE) {
+        const { data, error: ordErr } = await db
+          .from('orders')
+          .select('*, order_items(*)')
+          .order('created_at', { ascending: false })
+          .range(from, from + PAGE - 1);
+        if (seq !== _loadSeq) return;   // a newer load started — discard this snapshot
+        if (ordErr) {
+          console.error('Load error:', ordErr);
+          setSyncStatus('error');
+          return;
+        }
+        orderRows.push(...(data || []));
+        if (!data || data.length < PAGE) break;
       }
       orders = orderRows.map(row =>
-        dbToOrder(row, (itemRows || []).filter(i => i.order_id === row.id))
+        dbToOrder(row, row.order_items || [])
       );
       orders.forEach(o => { if (o.notes && !_notesMap[o.id]) _notesMap[o.id] = o.notes; });
       render();
