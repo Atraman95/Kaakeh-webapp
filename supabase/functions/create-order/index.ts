@@ -33,7 +33,6 @@ serve(async (req) => {
       address,
       delivery_date,
       delivery_time,
-      notes,
       delivery,
       items,
       regenerate_payment_link,
@@ -56,6 +55,32 @@ serve(async (req) => {
 
     if (skuError) throw skuError
 
+    // Catalog separation applies before any order or item mutation.
+    const requestedCatalog = body.catalog;
+    if (requestedCatalog !== undefined && !["kaakeh", "kamra"].includes(requestedCatalog)) {
+      throw new Error("Invalid catalog");
+    }
+    let catalog = requestedCatalog || "kaakeh";
+    if (order_id) {
+      const { data: existing, error: existingError } = await supabase
+        .from("orders").select("catalog").eq("id", order_id).single();
+      if (existingError) throw existingError;
+      catalog = existing.catalog || "kaakeh";
+      if (requestedCatalog && requestedCatalog !== catalog) throw new Error("Cannot change an order's catalog");
+    }
+    for (const item of items) {
+      const sku = skus?.find((s: any) => s.id === item.sku_id);
+      if (!sku || !Number.isFinite(Number(item.qty)) || Number(item.qty) <= 0) {
+        throw new Error("Invalid SKU or quantity");
+      }
+      if (item.line_type !== undefined && !["sale", "sample"].includes(item.line_type)) {
+        throw new Error("Invalid line_type");
+      }
+      if (sku.id !== DELIVERY_SKU_ID && (sku.catalog || "kaakeh") !== catalog) {
+        throw new Error("Items must belong to the order's catalog");
+      }
+    }
+
     let order: any
 
     // 🔁 EDIT MODE
@@ -67,8 +92,7 @@ serve(async (req) => {
           phone,
           address,
           delivery_date,
-          delivery_time,
-          notes: notes ?? null,
+          delivery_time
         })
         .eq("id", order_id)
         .select()
@@ -94,7 +118,7 @@ serve(async (req) => {
           address,
           delivery_date,
           delivery_time,
-          notes: notes ?? null,
+          catalog,
           order_status: "new",
           payment_status: "unpaid"
         })
@@ -112,15 +136,17 @@ serve(async (req) => {
       const sku = skus?.find((s: any) => s.id === item.sku_id)
       if (!sku) continue
 
-      const unit_price =
+      const line_type = item.line_type === "sample" ? "sample" : "sale"
+
+      // Prices stay server-derived from the SKU. A sample is charged 0, but the
+      // SKU's normal price is retained in list_price for display.
+      const list_price =
         sku.pricing_type === "per_pack"
           ? sku.price / sku.base_quantity
           : sku.price
 
-      const line_total =
-        sku.pricing_type === "per_pack"
-          ? (sku.price / sku.base_quantity) * item.qty
-          : sku.price * item.qty
+      const unit_price = line_type === "sample" ? 0 : list_price
+      const line_total = line_type === "sample" ? 0 : unit_price * item.qty
       subtotal += line_total
 
       orderItems.push({
@@ -129,7 +155,9 @@ serve(async (req) => {
         product_name: sku.name,
         qty: item.qty,
         unit_price,
-        line_total
+        line_total,
+        line_type,
+        list_price
       })
     }
 
@@ -145,7 +173,9 @@ serve(async (req) => {
           product_name: deliverySku.name,
           qty: 1,
           unit_price: deliverySku.price,
-          line_total: deliverySku.price
+          line_total: deliverySku.price,
+          line_type: "sale",
+          list_price: deliverySku.price
         })
       }
     }
@@ -158,9 +188,12 @@ serve(async (req) => {
       if (itemsError) throw itemsError
     }
 
-    // Stripe Checkout Session — CREATE mode, or on explicit regeneration
+    // Stripe Checkout Session — CREATE mode, or on explicit regeneration.
+    // Skipped when nothing is chargeable (e.g. an all-sample order): Stripe
+    // rejects a zero-amount session, which would fail the request after the
+    // order row has already been written.
     let payment_link: string | null = null
-    if (!order_id || regenerate_payment_link) {
+    if ((!order_id || regenerate_payment_link) && subtotal > 0) {
       const session = await stripe.checkout.sessions.create({
         payment_method_types: ["card"],
         line_items: [{

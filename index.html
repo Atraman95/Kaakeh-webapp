@@ -210,6 +210,28 @@
       background: rgba(255, 255, 255, .22);
     }
 
+    .sku-btn {
+      background: rgba(255, 255, 255, .10);
+      color: #fff;
+      border: 1px solid rgba(255, 255, 255, .24);
+      padding: 7px 13px;
+      border-radius: var(--radius-sm);
+      font-size: .78rem;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      transition: background .15s, transform .1s;
+      white-space: nowrap;
+      font-family: var(--font-body);
+    }
+
+    .sku-btn:hover {
+      background: rgba(255, 255, 255, .22);
+      transform: translateY(-1px);
+    }
+
     .add-btn {
       background: var(--gold);
       color: #fff;
@@ -263,6 +285,14 @@
 
       .logo-sub {
         display: none;
+      }
+
+      .sku-btn .btn-label {
+        display: none;
+      }
+
+      .sku-btn {
+        padding: 7px 9px;
       }
     }
 
@@ -319,7 +349,7 @@
 
     #view-today,
     #view-upcoming,
-    #view-all {
+    #view-kamra {
       max-width: 860px;
       margin: 0 auto;
       width: 100%;
@@ -1404,6 +1434,57 @@
       flex: 1;
     }
 
+    /* ── SAMPLE LINES ── */
+    .btn-sample {
+      flex-shrink: 0;
+      padding: 6px 9px;
+      font: inherit;
+      font-size: .72rem;
+      letter-spacing: .02em;
+      color: var(--text-md);
+      background: var(--surface-2);
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      transition: background .12s, border-color .12s, color .12s;
+    }
+
+    .btn-sample[data-sample="1"] {
+      background: #e8f0e8;
+      border-color: #7da87d;
+      color: #2f5c2f;
+      font-weight: 600;
+    }
+
+    .btn-sample:focus-visible {
+      outline: 3px solid var(--gold);
+      outline-offset: 2px;
+    }
+
+    .item-form-row.is-sample .inp-sku,
+    .item-form-row.is-sample .inp-qty {
+      background: #f5f8f5;
+      border-color: #cedbce;
+    }
+
+    .sample-tag {
+      display: inline-block;
+      padding: 2px 7px;
+      border-radius: 99px;
+      background: #e8f0e8;
+      color: #2f5c2f;
+      font-size: .68rem;
+      font-weight: 700;
+      letter-spacing: .03em;
+      text-transform: uppercase;
+      white-space: nowrap;
+    }
+
+    .price-was {
+      text-decoration: line-through;
+      opacity: .6;
+    }
+
     .rm-item {
       background: none;
       border: none;
@@ -1748,7 +1829,7 @@
       min-width: 54px;
     }
 
-    /* pill toggle for Today / All Orders date filter */
+    /* pill toggle for Orders / Prep Totals */
     .filter-pill {
       display: flex;
       background: var(--surface-2);
@@ -1797,10 +1878,33 @@
     }
 
     .prep-row-head {
-      display: flex;
+      display: grid;
+      grid-template-columns: 40px minmax(0, 1fr);
       align-items: center;
       gap: 10px;
-      padding: 13px 16px;
+      padding: 10px 12px;
+    }
+
+    .prep-check-hit { display:flex; align-items:center; justify-content:center; min-width:40px; min-height:44px; cursor:pointer; }
+    .prep-check { width:24px; height:24px; accent-color:#215b39; cursor:pointer; }
+    .prep-detail-toggle { display:flex; align-items:center; gap:10px; text-align:left; width:100%; min-width:0; min-height:44px; background:none; border:0; padding:0; font:inherit; cursor:pointer; }
+    .prep-detail-toggle:focus-visible, .prep-check:focus-visible, .prep-undo:focus-visible { outline:3px solid var(--gold); outline-offset:3px; }
+    .prep-detail-toggle .prep-row-name { overflow-wrap:anywhere; font-size:16px; }
+    .prep-row.is-done { background:#f1f5f1; border-color:#cedbce; box-shadow:none; }
+    .prep-row.is-done .prep-row-name { text-decoration:line-through; color:#657165; }
+    .prep-row.is-done .prep-qty-badge { color:#657165; }
+    .prep-row.is-saving { opacity:.7; }
+    .prep-row-foot { display:flex; align-items:center; flex-wrap:wrap; gap:8px; padding:0 12px 10px 62px; font-size:14px; color:var(--text-md); }
+    .prep-row.is-done .prep-row-foot { color:#436043; }
+    .prep-undo { border:0; background:none; text-decoration:underline; font:inherit; color:var(--primary); padding:6px; cursor:pointer; }
+    .prep-progress { display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:8px; padding:12px 14px; border-radius:10px; background:var(--surface-2); font-size:14px; }
+    .prep-progress progress { width:120px; height:8px; accent-color:#215b39; }
+    .prep-notice { padding:10px 12px; border:1px solid var(--border); border-radius:8px; font-size:14px; background:var(--surface); }
+    .prep-notice button { font:inherit; color:var(--primary); background:none; border:0; padding:6px; text-decoration:underline; cursor:pointer; }
+    .prep-order-count { font-size:14px; }
+    @media (max-width:480px) {
+      .prep-detail-toggle .prep-row-meta { flex-wrap:wrap; justify-content:flex-end; gap:5px; max-width:100px; }
+      .prep-detail-toggle .prep-order-count { flex-basis:100%; text-align:right; }
     }
 
     .prep-row-name {
@@ -1827,7 +1931,7 @@
     }
 
     .prep-order-count {
-      font-size: .72rem;
+      font-size: .875rem;
       color: var(--text-muted);
       font-weight: 500;
       white-space: nowrap;
@@ -1843,9 +1947,42 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
+      gap: 10px;
       padding: 7px 16px;
       font-size: .82rem;
       color: var(--text-md);
+      min-height: 44px;
+      cursor: pointer;
+    }
+
+    .prep-bd-check {
+      width: 20px;
+      height: 20px;
+      flex-shrink: 0;
+      accent-color: #215b39;
+      cursor: pointer;
+    }
+
+    .prep-breakdown-row .prep-bd-name {
+      flex: 1;
+      min-width: 0;
+      overflow-wrap: anywhere;
+    }
+
+    .prep-bd-status {
+      display: block;
+      font-size: .74rem;
+      font-weight: 500;
+      color: #8a6d3b;
+    }
+
+    .prep-breakdown-row.is-done .prep-bd-name {
+      text-decoration: line-through;
+      color: #657165;
+    }
+
+    .prep-breakdown-row.is-done .prep-bd-qty {
+      color: #657165;
     }
 
     .prep-breakdown-row + .prep-breakdown-row {
@@ -2611,6 +2748,19 @@
       overflow: hidden;
       line-height: 1.4;
     }
+    .kamra-badge { display:inline-block; background:#e5f1e9; color:#215b39; border:1px solid #b8d4c1; border-radius:6px; padding:2px 7px; font:600 12px var(--font-body); }
+    .kamra-toolbar { display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:12px; margin-bottom:20px; }
+    .kamra-toolbar h1 { font:600 2rem var(--font-display); color:#215b39; }
+    .kamra-actions { display:flex; flex-wrap:wrap; gap:8px; }
+    .kamra-actions button { background:#215b39; color:white; font-size:14px; min-height:40px; }
+    .kamra-section-title { font-size:16px; margin:20px 0 12px; }
+    .catalog-heading { font-size:14px; margin:16px 0 8px; color:var(--text-md); }
+    .kamra-sku-list { background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); padding:0 16px; }
+    .kamra-sku-row { display:flex; justify-content:space-between; gap:12px; padding:12px 0; border-bottom:1px solid var(--border); font-size:16px; }
+    .kamra-sku-row:last-child { border-bottom:0; }
+    .kamra-sku-row small { display:block; font-size:14px; color:var(--text-md); }
+    .kamra-sku-row strong { white-space:nowrap; font-size:14px; }
+    #sku-overlay { z-index:1200; }
   </style>
 </head>
 
@@ -2629,7 +2779,10 @@
         <div class="sync-dot" id="sync-dot"></div>
         <span class="sync-label" id="sync-label">Connecting…</span>
       </div>
-      <button class="add-btn" onclick="openModal()">
+      <button class="sku-btn" onclick="openSkuModal()" aria-label="Add Kaakeh SKU" title="Add Kaakeh SKU">
+        <span>＋</span><span class="btn-label">Add SKU</span>
+      </button>
+      <button class="add-btn" onclick="openModal()" aria-label="New Kaakeh Order" title="New Kaakeh Order">
         <span>＋</span><span class="btn-label">New Order</span>
       </button>
     </div>
@@ -2641,11 +2794,24 @@
     <div class="tab active" data-tab="today" onclick="switchTab('today')">Today</div>
     <div class="tab" data-tab="upcoming" onclick="switchTab('upcoming')">Upcoming</div>
     <div class="tab" data-tab="calendar" onclick="switchTab('calendar')">Calendar</div>
-    <div class="tab" data-tab="all" onclick="switchTab('all')">All Orders</div>
+    <div class="tab" data-tab="kamra" onclick="switchTab('kamra')">Kamra</div>
   </nav>
 
   <!-- ─── MAIN ─── -->
   <main>
+    <div id="view-kamra" class="view" style="display:none">
+      <div class="kamra-toolbar">
+        <h1>Kamra</h1>
+        <div class="kamra-actions">
+          <button class="add-btn" onclick="openModal(null, 'kamra')">＋ New Kamra Order</button>
+          <button class="add-btn" onclick="openSkuModal('kamra')">＋ Add Kamra SKU</button>
+        </div>
+      </div>
+      <h2 class="kamra-section-title">Today &amp; Upcoming</h2>
+      <div id="kamra-orders" class="orders-list"></div>
+      <h2 class="kamra-section-title">Active Kamra SKUs</h2>
+      <div id="kamra-skus" class="kamra-sku-list"></div>
+    </div>
     <!-- TODAY VIEW -->
     <div id="view-today" class="view">
       <div id="today-toggle-wrap"></div>
@@ -2656,23 +2822,6 @@
     <div id="view-upcoming" class="view" style="display:none">
       <div id="upcoming-toggle-wrap"></div>
       <div class="orders-list" id="upcoming-list"></div>
-    </div>
-
-    <!-- ALL ORDERS VIEW -->
-    <div id="view-all" class="view" style="display:none">
-      <div class="view-header">
-        <div class="view-title">All Orders</div>
-      </div>
-      <div class="search-wrap">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
-          stroke-linecap="round" stroke-linejoin="round">
-          <circle cx="11" cy="11" r="8" />
-          <line x1="21" y1="21" x2="16.65" y2="16.65" />
-        </svg>
-        <input type="search" id="search-input" placeholder="Search name, phone, address, item…" oninput="renderAll()">
-      </div>
-      <div class="filters" id="all-filters"></div>
-      <div class="orders-list" id="all-list"></div>
     </div>
 
     <!-- CALENDAR VIEW -->
@@ -2894,6 +3043,33 @@
     </div>
   </div>
 
+  <!-- ─── ADD SKU MODAL ─── -->
+  <div class="overlay" id="sku-overlay" onclick="onSkuOverlayClick(event)">
+    <div class="modal" style="max-width:520px">
+      <div class="modal-head">
+        <h2 id="sku-modal-title">Add SKU</h2>
+        <button class="modal-close" onclick="closeSkuModal()">✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-section">
+          <div class="section-label">SKU Details</div>
+          <div class="form-row">
+            <div class="fg"><label>SKU Name *</label><input type="text" id="sku-name" placeholder="e.g. Nabulsi Fatayer"></div>
+          </div>
+          <div class="form-row">
+            <div class="fg"><label>Category *</label><input type="text" id="sku-category" placeholder="e.g. Fatayer"></div>
+            <div class="fg"><label>Unit Price (AED) *</label><input type="number" id="sku-price" min="0.01" step="0.01" inputmode="decimal" placeholder="0.00"></div>
+          </div>
+          <div class="parse-err" id="sku-error"></div>
+        </div>
+      </div>
+      <div class="modal-foot">
+        <button class="btn-cancel" onclick="closeSkuModal()">Cancel</button>
+        <button class="btn-save" id="btn-save-sku" onclick="saveSku()">Add SKU</button>
+      </div>
+    </div>
+  </div>
+
   <!-- ─── FAB ─── -->
   <button class="fab" onclick="openModal()" title="New Order">＋</button>
 
@@ -2986,13 +3162,99 @@
     // ══════════════════════════════════════════════
     let orders = [];
     let editId = null;
+    let orderCatalog = 'kaakeh';
+    let skuCatalog = 'kaakeh';
     let curTab = 'today';
     let parsedImport = null;
-    let filterDate = 'all';   // 'today' | 'all'   (All Orders tab date toggle)
-    let filterStatus = 'all';   // 'all' | 'new' | 'in-progress' | 'ready' | 'delivered'
-    let filterPayment = 'all';   // 'all' | 'paid' | 'unpaid'
     const prepView = { today: false, upcoming: false };
-    const prepExpanded = { today: null, upcoming: null };
+    // Breakdowns start expanded so the kitchen can tick people off without a tap;
+    // this holds only the item keys the user has explicitly collapsed.
+    const prepCollapsed = { today: new Set(), upcoming: new Set() };
+    let prepProgress = {};
+    let prepLoaded = false;
+    let prepError = '';
+    let prepLoadSeq = 0;
+    const prepSaving = new Set();
+
+    function prepKey(date, catalog, itemKey) { return JSON.stringify([date, catalog, itemKey]); }
+    // Checkmarks are stored per customer: one per person, per item, per date.
+    function prepOrderKey(date, catalog, itemKey, orderId) { return JSON.stringify([date, catalog, itemKey, orderId]); }
+    // Lets the inline handlers look up a row's customer lines without encoding them in HTML.
+    const prepRowIndex = new Map();
+
+    async function loadPrepProgress() {
+      const seq = ++prepLoadSeq;
+      try {
+        const rows = [];
+        for (let from = 0; ; from += 1000) {
+          const { data, error } = await db.from('prep_progress')
+            .select('delivery_date,catalog,item_key,order_id,prepared_quantity')
+            .gte('delivery_date', todayStr())
+            .order('delivery_date').order('catalog').order('item_key').order('order_id').range(from, from + 999);
+          if (seq !== prepLoadSeq) return;
+          if (error) throw error;
+          rows.push(...(data || []));
+          if (!data || data.length < 1000) break;
+        }
+        prepProgress = Object.fromEntries(rows.map(r => [prepOrderKey(r.delivery_date, r.catalog, r.item_key, r.order_id), Number(r.prepared_quantity)]));
+        prepLoaded = true;
+        prepError = '';
+      } catch (error) {
+        if (seq !== prepLoadSeq) return;
+        prepError = 'Could not sync checkmarks. Showing the last saved state; reconnect and retry.';
+        console.error('Prep sync failed:', error);
+      }
+      render();
+    }
+
+    // entries is [{ orderId, quantity }] — one upsert covers a whole item when the
+    // parent "check all" box is used.
+    async function savePrepEntries(date, catalog, itemKey, entries) {
+      if (!prepLoaded || prepError || !entries.length) return;
+      if (entries.some(e => !e.orderId || !Number.isFinite(e.quantity) || e.quantity < 0)) return;
+      const keys = entries.map(e => prepOrderKey(date, catalog, itemKey, e.orderId));
+      if (keys.some(k => prepSaving.has(k))) return;
+      keys.forEach(k => prepSaving.add(k));
+      render();
+      try {
+        // Save the displayed quantity, not a later total that the kitchen has not confirmed.
+        const stamp = new Date().toISOString();
+        const { data, error } = await db.from('prep_progress').upsert(
+          entries.map(e => ({
+            delivery_date: date, catalog, item_key: itemKey, order_id: e.orderId,
+            prepared_quantity: e.quantity, updated_at: stamp,
+          })),
+          { onConflict: 'delivery_date,catalog,item_key,order_id' }
+        ).select('order_id,prepared_quantity');
+        if (error) throw error;
+        ++prepLoadSeq; // Reject reads started before this write completed.
+        (data || []).forEach(r => {
+          prepProgress[prepOrderKey(date, catalog, itemKey, r.order_id)] = Number(r.prepared_quantity);
+        });
+      } catch (error) {
+        prepError = 'Could not confirm the save. Retry syncing before checking again.';
+        console.error('Prep save failed:', error);
+      } finally {
+        keys.forEach(k => prepSaving.delete(k));
+        render();
+      }
+    }
+
+    // One person's line on one item.
+    function togglePrepOrder(rowKey, orderId, checked) {
+      const row = prepRowIndex.get(rowKey);
+      const line = row && row.orders.find(o => o.orderId === orderId);
+      if (!line) return;
+      savePrepEntries(row.date, row.catalog, row.itemKey, [{ orderId, quantity: checked ? line.qty : 0 }]);
+    }
+
+    // Parent row: mark everyone on this item at once, or undo the lot.
+    function togglePrepItem(rowKey, checked) {
+      const row = prepRowIndex.get(rowKey);
+      if (!row) return;
+      savePrepEntries(row.date, row.catalog, row.itemKey,
+        row.orders.map(o => ({ orderId: o.orderId, quantity: checked ? o.qty : 0 })));
+    }
     let skus = [];
     const skusById = {};
     const DELIVERY_SKU_ID = '76f384c5-d815-4d14-90ce-ea3dfbaf5bec';
@@ -3030,7 +3292,12 @@
           unit = parseFloat(i.unitPrice) || 0;
           // Imported items may carry a name the parser couldn't price — fall back
           // to SKU pricing so the summary total matches the server-computed total.
-          if (!unit) unit = skuUnitPrice(skusById[i.sku_id] || skusById[findSkuIdByName(name)]);
+          // Samples are legitimately zero, so they must skip that fallback.
+          if (!unit && i.lineType !== 'sample') unit = skuUnitPrice(skusById[i.sku_id] || skusById[findSkuIdByName(name)]);
+        }
+        if (i.lineType === 'sample') {
+          const list = parseFloat(i.listPrice) || skuUnitPrice(skusById[i.sku_id] || skusById[findSkuIdByName(name)]);
+          return { text: `${qty} x ${name} — ${list.toFixed(2)} → 0.00 (Sample)`, lineTotal: 0 };
         }
         const lineTotal = qty * unit;
         return { text: `${qty} x ${name} — AED ${lineTotal.toFixed(2)}`, lineTotal };
@@ -3091,6 +3358,7 @@
     // ══════════════════════════════════════════════
     function dbToOrder(row, itemRows) {
       return {
+        catalog: row.catalog || 'kaakeh',
         id: row.id,
         createdAt: row.created_at,
         customerName: row.customer_name,
@@ -3110,6 +3378,9 @@
           quantity: i.qty ?? i.quantity ?? 0,
           unitPrice: i.unit_price ?? 0,
           sku_id: i.sku_id || '',
+          // Rows written before the sample feature have no line_type; treat them as sales.
+          lineType: i.line_type === 'sample' ? 'sample' : 'sale',
+          listPrice: i.list_price == null ? null : parseFloat(i.list_price),
         })),
       };
     }
@@ -3174,7 +3445,7 @@
     async function loadSkus() {
       const { data, error } = await db
         .from('skus')
-        .select('id,name,category,price,pricing_type,base_quantity,active')
+        .select('id,name,category,price,pricing_type,base_quantity,active,catalog')
         .eq('active', true)
         .order('name', { ascending: true });
       if (error) {
@@ -3184,6 +3455,88 @@
       skus = data || [];
       Object.keys(skusById).forEach(k => delete skusById[k]);
       skus.forEach(s => { skusById[s.id] = s; });
+      if (curTab === 'kamra') renderKamra();
+      return true;
+    }
+
+    // ══════════════════════════════════════════════
+    //  ADD SKU
+    // ══════════════════════════════════════════════
+    function openSkuModal(catalog = 'kaakeh') {
+      if (document.getElementById('btn-save-sku').disabled && document.getElementById('sku-overlay').classList.contains('open')) return;
+      skuCatalog = catalog;
+      document.getElementById('sku-modal-title').textContent = catalog === 'kamra' ? 'Add Kamra SKU' : 'Add Kaakeh SKU';
+      document.getElementById('sku-name').value = '';
+      document.getElementById('sku-category').value = '';
+      document.getElementById('sku-price').value = '';
+      const errorEl = document.getElementById('sku-error');
+      errorEl.textContent = '';
+      errorEl.classList.remove('show');
+      const btn = document.getElementById('btn-save-sku');
+      btn.disabled = false;
+      btn.classList.remove('btn-success');
+      btn.textContent = 'Add SKU';
+      document.getElementById('sku-overlay').classList.add('open');
+      setTimeout(() => document.getElementById('sku-name').focus(), 100);
+    }
+
+    function closeSkuModal() {
+      document.getElementById('sku-overlay').classList.remove('open');
+    }
+
+    function onSkuOverlayClick(e) {
+      if (e.target === document.getElementById('sku-overlay')) closeSkuModal();
+    }
+
+    function showSkuError(message) {
+      const errorEl = document.getElementById('sku-error');
+      errorEl.textContent = message;
+      errorEl.classList.add('show');
+    }
+
+    async function saveSku() {
+      const btn = document.getElementById('btn-save-sku');
+      if (btn.disabled) return;
+      const name = document.getElementById('sku-name').value.trim();
+      const category = document.getElementById('sku-category').value.trim();
+      const price = Number(document.getElementById('sku-price').value);
+      document.getElementById('sku-error').classList.remove('show');
+
+      if (!name) { showSkuError('Please enter an SKU name.'); return; }
+      if (!category) { showSkuError('Please enter a category.'); return; }
+      if (!Number.isFinite(price) || price <= 0) { showSkuError('Please enter a valid unit price above zero.'); return; }
+      if (skus.some(s => (s.name || '').trim().toLowerCase() === name.toLowerCase())) {
+        showSkuError('An SKU with this name already exists.');
+        return;
+      }
+
+      setBtnState(btn, 'loading');
+      const { error } = await db.from('skus').insert({
+        catalog: skuCatalog,
+        name,
+        category,
+        price,
+        pricing_type: 'fixed',
+        base_quantity: 1,
+        active: true,
+      });
+
+      if (error) {
+        setBtnState(btn, 'idle');
+        if (error.code === '23505') showSkuError('An SKU with this name already exists.');
+        else showSkuError('Could not add the SKU: ' + error.message);
+        return;
+      }
+
+      await loadSkus();
+      document.querySelectorAll('#items-container .inp-sku').forEach(select => {
+        select.innerHTML = buildSkuOptions(select.value, orderCatalog);
+      });
+      document.querySelectorAll('#fab-items-container .inp-sku').forEach(select => {
+        select.innerHTML = buildSkuOptions(select.value, 'kaakeh');
+      });
+      setBtnState(btn, 'success', 'SKU Added!');
+      setTimeout(closeSkuModal, 1000);
     }
 
     // ══════════════════════════════════════════════
@@ -3193,7 +3546,9 @@
       const items = (data.items || []).map(i => {
         const sku_id = i.sku_id || findSkuIdByName(i.name);
         const qty = parseFloat(i.qty ?? i.quantity) || 0;
-        return { sku_id, qty };
+        // line_type must survive this rebuild or the server prices a sample as a sale.
+        const line_type = (i.line_type || i.lineType) === 'sample' ? 'sample' : 'sale';
+        return { sku_id, qty, line_type };
       }).filter(i => i.sku_id && i.qty > 0);
 
       if (!items.length) {
@@ -3202,6 +3557,7 @@
       }
 
       const payload = {
+        catalog: data.catalog || 'kaakeh',
         ...(existingId ? { order_id: existingId } : {}),
         customer_name: data.customerName,
         phone: data.phone || '',
@@ -3281,6 +3637,7 @@
           headers: { 'Content-Type': 'application/json', apikey: SUPABASE_KEY, Authorization: `Bearer ${SUPABASE_KEY}` },
           body: JSON.stringify({
             order_id: orderId,
+            catalog: o.catalog || 'kaakeh',
             regenerate_payment_link: true,
             customer_name: o.customerName,
             phone: o.phone || '',
@@ -3384,8 +3741,9 @@
       db.channel('sweet-orders-sync')
         .on('postgres_changes', { event: '*', schema: 'public', table: 'orders' }, _scheduleReload)
         .on('postgres_changes', { event: '*', schema: 'public', table: 'order_items' }, _scheduleReload)
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'prep_progress' }, loadPrepProgress)
         .subscribe(status => {
-          if (status === 'SUBSCRIBED') setSyncStatus('live');
+          if (status === 'SUBSCRIBED') { setSyncStatus('live'); loadPrepProgress(); _scheduleReload(); }
           else if (status === 'CHANNEL_ERROR' || status === 'TIMED_OUT') setSyncStatus('error');
         });
     }
@@ -3435,19 +3793,21 @@
       return price;
     }
 
-    function findSkuIdByName(name) {
+    function findSkuIdByName(name, catalog = 'kaakeh') {
       const key = (name || '').trim().toLowerCase();
       if (!key) return '';
-      const exact = skus.find(s => (s.name || '').trim().toLowerCase() === key);
+      const candidates = skus.filter(s => (s.catalog || 'kaakeh') === catalog);
+      const exact = candidates.find(s => (s.name || '').trim().toLowerCase() === key);
       if (exact) return exact.id;
-      const partial = skus.find(s => (s.name || '').trim().toLowerCase().includes(key) || key.includes((s.name || '').trim().toLowerCase()));
+      const partial = candidates.find(s => (s.name || '').trim().toLowerCase().includes(key) || key.includes((s.name || '').trim().toLowerCase()));
       return partial ? partial.id : '';
     }
 
-    function buildSkuOptions(selectedSkuId) {
-      if (!skus.length) return '<option value="">No active SKUs</option>';
+    function buildSkuOptions(selectedSkuId, catalog = 'kaakeh') {
+      const candidates = skus.filter(s => (s.catalog || 'kaakeh') === catalog || (s.id === DELIVERY_SKU_ID && s.id === selectedSkuId));
+      if (!candidates.length) return '<option value="">No active SKUs — add an SKU first</option>';
       const opts = ['<option value="">Select item</option>'];
-      skus.forEach(sku => {
+      candidates.forEach(sku => {
         const sel = sku.id === selectedSkuId ? ' selected' : '';
         opts.push(`<option value="${esc(sku.id)}"${sel}>${esc(sku.name)}</option>`);
       });
@@ -3467,60 +3827,27 @@
     function render() {
       if (curTab === 'today') renderToday();
       else if (curTab === 'upcoming') renderUpcoming();
-      else if (curTab === 'calendar') renderCalendar();
-      else renderAll();
+      else if (curTab === 'kamra') renderKamra();
+      else renderCalendar();
     }
 
-    // ── FILTER SETTERS ──
-    function setFilterDate(v) { filterDate = v; render(); }
-    function setFilterStatus(v) { filterStatus = v; render(); }
-    function setFilterPayment(v) { filterPayment = v; render(); }
-
-    function applyFilters(list, { useDateToggle = false } = {}) {
-      let out = list;
-      if (useDateToggle && filterDate === 'today') {
-        const today = todayStr();
-        out = out.filter(o => o.deliveryDate === today);
-      }
-      if (filterStatus !== 'all') out = out.filter(o => o.orderStatus === filterStatus);
-      if (filterPayment !== 'all') out = out.filter(o => o.paymentStatus === filterPayment);
-      return out;
+    function kamraBadge(order) {
+      return order.catalog === 'kamra' ? '<span class="kamra-badge">Kamra</span> ' : '';
     }
 
-    function buildFilterBar(cid, { showDateToggle = false } = {}) {
-      const el = document.getElementById(cid);
-      if (!el) return;
-
-      const STATUSES = [
-        { v: 'all', l: 'All' }, { v: 'new', l: 'New' }, { v: 'in-progress', l: 'Confirmed' },
-        { v: 'ready', l: 'Ready' }, { v: 'delivered', l: 'Delivered' },
-      ];
-      const PAYMENTS = [
-        { v: 'all', l: 'All' }, { v: 'unpaid', l: 'Unpaid' }, { v: 'paid', l: 'Paid' },
-      ];
-
-      const dateRow = showDateToggle ? `
-    <div class="filter-row">
-      <span class="filter-row-label">Date</span>
-      <div class="filter-pill">
-        <button class="filter-pill-btn${filterDate === 'today' ? ' active' : ''}" onclick="setFilterDate('today')">Today</button>
-        <button class="filter-pill-btn${filterDate === 'all' ? ' active' : ''}" onclick="setFilterDate('all')">All Orders</button>
-      </div>
-    </div>` : '';
-
-      const statusRow = `
-    <div class="filter-row">
-      <span class="filter-row-label">Status</span>
-      ${STATUSES.map(s => `<div class="chip${filterStatus === s.v ? ' active' : ''}" onclick="setFilterStatus('${s.v}')">${s.l}</div>`).join('')}
-    </div>`;
-
-      const paymentRow = `
-    <div class="filter-row">
-      <span class="filter-row-label">Payment</span>
-      ${PAYMENTS.map(p => `<div class="chip${filterPayment === p.v ? ' active' : ''}" onclick="setFilterPayment('${p.v}')">${p.l}</div>`).join('')}
-    </div>`;
-
-      el.innerHTML = `<div class="filter-bar">${dateRow}${statusRow}${paymentRow}</div>`;
+    function renderKamra() {
+      const list = orders.filter(o => o.catalog === 'kamra' && o.deliveryDate >= todayStr())
+        .sort((a, b) => a.deliveryDate.localeCompare(b.deliveryDate) || (a.deliveryTime || '').localeCompare(b.deliveryTime || ''));
+      let previousDate = '';
+      document.getElementById('kamra-orders').innerHTML = list.length ? list.map(o => {
+        const heading = previousDate !== o.deliveryDate ? '<div class="date-group-label">' + dayLabel(o.deliveryDate) + '</div>' : '';
+        previousDate = o.deliveryDate;
+        return heading + renderCard(o);
+      }).join('') : '<div class="empty"><p>No Kamra orders scheduled. Add a dish, then create your first order.</p></div>';
+      const dishes = skus.filter(s => s.catalog === 'kamra');
+      document.getElementById('kamra-skus').innerHTML = dishes.length ? dishes.map(s =>
+        '<div class="kamra-sku-row"><div>' + esc(s.name) + '<small>' + esc(s.category) + '</small></div><strong>AED ' + skuUnitPrice(s).toFixed(2) + ' / unit</strong></div>'
+      ).join('') : '<div class="empty"><p>No Kamra SKUs yet.</p></div>';
     }
 
     // TODAY
@@ -3567,87 +3894,141 @@
 
     function setPrepView(scope, val) {
       prepView[scope] = val;
-      prepExpanded[scope] = null;
+      prepCollapsed[scope].clear();
       render();
+      if (val) loadPrepProgress();
     }
 
     function togglePrepRow(scope, key) {
-      prepExpanded[scope] = prepExpanded[scope] === key ? null : key;
+      const collapsed = prepCollapsed[scope];
+      if (collapsed.has(key)) collapsed.delete(key); else collapsed.add(key);
       render();
     }
 
-    function renderPrepTotals(scope, orderList, containerId) {
-      if (!orderList.length) {
-        const msg = scope === 'today' ? 'No deliveries scheduled for today.' : 'No upcoming orders';
-        document.getElementById(containerId).innerHTML =
-          `<div class="empty"><div class="empty-icon"><svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" opacity=".35"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></div><p>${msg}</p></div>`;
-        return;
-      }
-      if (scope === 'upcoming') {
-        const groups = {};
-        orderList.forEach(o => { if (!groups[o.deliveryDate]) groups[o.deliveryDate] = []; groups[o.deliveryDate].push(o); });
-        let html = '';
-        Object.keys(groups).sort().forEach(date => {
-          html += `<div class="date-group-label">${dayLabel(date)}</div>`;
-          html += buildPrepRows(groups[date], scope, date);
-        });
-        document.getElementById(containerId).innerHTML = html;
-      } else {
-        document.getElementById(containerId).innerHTML = buildPrepRows(orderList, scope, '');
-      }
-    }
+    function fmtPrepQty(q) { return Number(q.toFixed(4)).toLocaleString('en-US', { maximumFractionDigits: 4 }); }
 
-    function buildPrepRows(orderList, scope, datePrefix) {
-      const map = {};
+    function aggregatePrep(orderList) {
+      const map = new Map();
       orderList.forEach(o => {
         (o.items || []).forEach(i => {
-          const key = i.sku_id || i.name || '?';
-          const displayName = i.sku_id
-            ? (skusById[i.sku_id]?.name || i.name || i.sku_id)
-            : (i.name || '?');
-          const qty = parseFloat(i.qty ?? i.quantity) || 0;
-          if (!map[key]) map[key] = { name: displayName, totalQty: 0, byOrder: {} };
-          map[key].totalQty += qty;
-          if (!map[key].byOrder[o.id]) map[key].byOrder[o.id] = { customerName: o.customerName || 'Unnamed', qty: 0 };
-          map[key].byOrder[o.id].qty += qty;
+          const itemKey = i.sku_id || i.name || '?';
+          const catalog = o.catalog || 'kaakeh';
+          const key = prepKey(o.deliveryDate, catalog, itemKey);
+          const qty = Number(i.qty ?? i.quantity) || 0;
+          if (qty <= 0 || !Number.isFinite(qty)) return;
+          if (!map.has(key)) map.set(key, {
+            key, date: o.deliveryDate, catalog, itemKey,
+            name: skusById[i.sku_id]?.name || i.name || itemKey,
+            totalQty: 0, byOrder: new Map(),
+          });
+          const row = map.get(key);
+          row.totalQty += qty;
+          if (!row.byOrder.has(o.id)) row.byOrder.set(o.id, { customerName: o.customerName || 'Unnamed', qty: 0 });
+          row.byOrder.get(o.id).qty += qty;
         });
       });
+      const rows = [...map.values()].map(row => {
+        const orders = [...row.byOrder.entries()].map(([orderId, o]) => {
+          const prepared = prepProgress[prepOrderKey(row.date, row.catalog, row.itemKey, orderId)] || 0;
+          const remaining = Math.max(0, Number((o.qty - prepared).toFixed(4)));
+          return { orderId, customerName: o.customerName, qty: o.qty, prepared, remaining, done: remaining === 0 && prepared > 0 };
+        }).sort((a, b) => b.qty - a.qty || a.customerName.localeCompare(b.customerName));
+        const prepared = orders.reduce((sum, o) => sum + o.prepared, 0);
+        const remaining = Math.max(0, Number((row.totalQty - prepared).toFixed(4)));
+        // The item counts as done only when every customer on it is done, so a new
+        // or increased order reopens both that person's line and the item itself.
+        return { ...row, orders, prepared, remaining, done: orders.length > 0 && orders.every(o => o.done) };
+      }).sort((a, b) => b.totalQty - a.totalQty || a.name.localeCompare(b.name));
+      rows.forEach(r => prepRowIndex.set(r.key, r));
+      return rows;
+    }
 
-      const rows = Object.entries(map).sort((a, b) => b[1].totalQty - a[1].totalQty);
-      if (!rows.length) return '';
+    function renderPrepTotals(scope, orderList, containerId) {
+      let notice = '';
+      if (prepError) notice = '<div class="prep-notice" role="alert">' + esc(prepError) +
+        ' <button onclick="loadPrepProgress()">Retry sync</button></div>';
+      else if (!prepLoaded) notice = '<div class="prep-notice" role="status">Loading shared checkmarks…</div>';
+      if (!orderList.length) {
+        document.getElementById(containerId).innerHTML = notice + '<div class="empty"><p>' +
+          (scope === 'today' ? 'No deliveries scheduled for today.' : 'No upcoming orders') + '</p></div>';
+        return;
+      }
+      const groups = new Map();
+      orderList.forEach(o => {
+        if (!groups.has(o.deliveryDate)) groups.set(o.deliveryDate, []);
+        groups.get(o.deliveryDate).push(o);
+      });
+      let html = notice;
+      [...groups.keys()].sort().forEach(date => {
+        const dayOrders = groups.get(date);
+        const rows = aggregatePrep(dayOrders);
+        const done = rows.filter(r => r.done).length;
+        if (scope === 'upcoming') html += '<div class="date-group-label">' + dayLabel(date) + '</div>';
+        html += '<div class="prep-progress"><span role="status">' +
+          (prepLoaded ? '<strong>' + done + ' of ' + rows.length + '</strong> items prepared' : 'Loading progress…') +
+          '</span><progress value="' + (prepLoaded ? done : 0) + '" max="' + Math.max(rows.length, 1) +
+          '" aria-label="Items prepared for ' + esc(date) + '"></progress></div>';
+        html += buildPrepRows(dayOrders, scope);
+      });
+      const host = document.getElementById(containerId);
+      host.innerHTML = html;
+      // indeterminate is a property, not an attribute, so it has to be set post-paint.
+      host.querySelectorAll('.prep-check[data-indeterminate="1"]').forEach(el => { el.indeterminate = true; });
+    }
 
-      const fmtQty = q => Number.isInteger(q) ? String(q) : q.toFixed(1);
-
-      return rows.map(([key, data]) => {
-        const expandKey = datePrefix ? `${datePrefix}::${key}` : key;
-        const isExpanded = prepExpanded[scope] === expandKey;
-        const breakdown = Object.values(data.byOrder).sort((a, b) => b.qty - a.qty || a.customerName.localeCompare(b.customerName));
-        const orderCountLabel = breakdown.length === 1 ? '1 order' : `${breakdown.length} orders`;
-        const breakdownHTML = isExpanded
-          ? `<div class="prep-breakdown">${breakdown.map(b =>
-              `<div class="prep-breakdown-row"><span class="prep-bd-name">${esc(b.customerName)}</span><span class="prep-bd-qty">${fmtQty(b.qty)}</span></div>`
-            ).join('')}</div>`
-          : '';
-        return `<div class="prep-row${isExpanded ? ' expanded' : ''}" data-prepscope="${esc(scope)}" data-prepkey="${esc(expandKey)}" onclick="togglePrepRow(this.dataset.prepscope,this.dataset.prepkey)">` +
-          `<div class="prep-row-head">` +
-          `<span class="prep-row-name">${esc(data.name)}</span>` +
-          `<span class="prep-row-meta"><span class="prep-order-count">${orderCountLabel}</span><span class="prep-qty-badge">${fmtQty(data.totalQty)}</span><span class="expand-chevron">▾</span></span>` +
-          `</div>${breakdownHTML}</div>`;
+    function buildPrepRows(orderList, scope) {
+      const rows = aggregatePrep(orderList);
+      return ['kaakeh', 'kamra'].map(catalog => {
+        const subset = rows.filter(row => row.catalog === catalog);
+        if (!subset.length) return '';
+        return '<h3 class="catalog-heading">' + (catalog === 'kamra' ? 'Kamra' : 'Kaakeh') + '</h3>' +
+          subset.map(row => renderPrepRow(row, scope)).join('');
       }).join('');
     }
 
-    // ALL
-    function renderAll() {
-      buildFilterBar('all-filters', { showDateToggle: true });
-      const q = (document.getElementById('search-input').value || '').toLowerCase().trim();
-      let list = orders.slice();
-      if (q) list = list.filter(o =>
-        o.customerName.toLowerCase().includes(q) ||
-        (o.phone || '').includes(q) ||
-        (o.address || '').toLowerCase().includes(q) ||
-        o.items.some(i => i.name.toLowerCase().includes(q)));
-      list = applyFilters(list, { useDateToggle: true }).sort((a, b) => b.createdAt - a.createdAt);
-      renderList('all-list', list, 'No orders found.');
+    function renderPrepRow(row, scope) {
+      const isExpanded = !prepCollapsed[scope].has(row.key);
+      const saving = row.orders.some(o => prepSaving.has(prepOrderKey(row.date, row.catalog, row.itemKey, o.orderId)));
+      const disabled = saving || !prepLoaded || !!prepError;
+      const checked = prepLoaded && row.done;
+      const partial = prepLoaded && !row.done && row.prepared > 0;
+      const rowKeyAttr = esc(row.key);
+      const doneCount = row.orders.filter(o => o.done).length;
+      const breakdownHTML = isExpanded ? '<div class="prep-breakdown">' + row.orders.map(o => {
+        const oChecked = prepLoaded && o.done;
+        const oStatus = o.prepared > 0 && !o.done
+          ? fmtPrepQty(o.prepared) + ' prepared \u00b7 ' + fmtPrepQty(o.remaining) + ' remaining' : '';
+        return '<label class="prep-breakdown-row' + (oChecked ? ' is-done' : '') + '">' +
+          '<input type="checkbox" class="prep-check prep-bd-check" aria-label="Done: ' +
+          esc(o.customerName) + ' \u2014 ' + esc(row.name) + '" data-rowkey="' + rowKeyAttr +
+          '" data-order="' + esc(o.orderId) + '" ' + (oChecked ? 'checked ' : '') + (disabled ? 'disabled ' : '') +
+          'onchange="togglePrepOrder(this.dataset.rowkey,this.dataset.order,this.checked)">' +
+          '<span class="prep-bd-name">' + esc(o.customerName) +
+          (oStatus ? '<span class="prep-bd-status">' + oStatus + '</span>' : '') + '</span>' +
+          '<span class="prep-bd-qty">' + fmtPrepQty(o.qty) + '</span></label>';
+      }).join('') + '</div>' : '';
+      const status = saving ? 'Saving\u2026' : !prepLoaded ? 'Waiting for shared checkmarks\u2026' :
+        row.prepared > 0 ? fmtPrepQty(row.prepared) + ' prepared \u00b7 ' + fmtPrepQty(row.remaining) + ' remaining' :
+        fmtPrepQty(row.totalQty) + ' remaining';
+      return '<div class="prep-row' + (checked ? ' is-done' : '') + (saving ? ' is-saving' : '') +
+        (isExpanded ? ' expanded' : '') + '">' +
+        '<div class="prep-row-head">' +
+        '<label class="prep-check-hit" title="Mark every order for this item done, or undo">' +
+        '<input type="checkbox" class="prep-check" aria-label="Done: all ' + esc(row.name) + ' for ' + esc(row.date) +
+        '" data-rowkey="' + rowKeyAttr + '" ' + (checked ? 'checked ' : '') +
+        (partial ? 'data-indeterminate="1" ' : '') + (disabled ? 'disabled ' : '') +
+        'onchange="togglePrepItem(this.dataset.rowkey,this.checked)"></label>' +
+        '<button class="prep-detail-toggle" data-scope="' + esc(scope) + '" data-key="' + rowKeyAttr +
+        '" aria-expanded="' + isExpanded + '" onclick="togglePrepRow(this.dataset.scope,this.dataset.key)">' +
+        '<span class="prep-row-name">' + esc(row.name) + '</span>' +
+        '<span class="prep-row-meta"><span class="prep-order-count">' + doneCount + '/' + row.orders.length +
+        (row.orders.length === 1 ? ' order' : ' orders') + '</span><span class="prep-qty-badge">' +
+        fmtPrepQty(row.totalQty) + '</span><span class="expand-chevron" aria-hidden="true">\u25be</span></span></button></div>' +
+        '<div class="prep-row-foot"><span>' + status + '</span>' +
+        (row.prepared > 0 && !row.done ? '<button class="prep-undo" data-rowkey="' + rowKeyAttr + '" ' +
+          (disabled ? 'disabled ' : '') +
+          'onclick="togglePrepItem(this.dataset.rowkey,false)">Undo all</button>' : '') +
+        '</div>' + breakdownHTML + '</div>';
     }
 
     function renderList(cid, list, msg) {
@@ -3689,6 +4070,13 @@
       calCurrentMonthDate = new Date(today.getFullYear(), today.getMonth(), 1);
       calSelectedDate = today;
       renderCalendar();
+    }
+
+    function openCalendarDate(dateString) {
+      const [year, month, day] = dateString.split('-').map(Number);
+      calCurrentMonthDate = new Date(year, month - 1, 1);
+      calSelectedDate = new Date(year, month - 1, day);
+      switchTab('calendar');
     }
 
     function calPrevMonth() {
@@ -3776,7 +4164,7 @@
           dotsHtml += '<div class="cal-dot-wrap">';
           const maxDots = 3;
           for (let i = 0; i < Math.min(dayOrders.length, maxDots); i++) {
-            dotsHtml += `<div class="cal-dot bg-${dayOrders[i].orderStatus}"></div>`;
+            dotsHtml += `<div class="cal-dot bg-${dayOrders[i].orderStatus}" ${dayOrders[i].catalog === 'kamra' ? 'style="outline:2px solid #215b39;outline-offset:1px" title="Kamra"' : ''}></div>`;
           }
           if (dayOrders.length > maxDots) {
             dotsHtml += `<span style="font-size:10px;color:var(--text-muted);margin-left:2px">+${dayOrders.length - maxDots}</span>`;
@@ -3791,7 +4179,7 @@
           const maxLabels = 2;
           for (let i = 0; i < Math.min(dayOrders.length, maxLabels); i++) {
             const ev = dayOrders[i];
-            const title = ev.customerName || 'Unnamed';
+            const title = (ev.catalog === 'kamra' ? 'Kamra · ' : '') + (ev.customerName || 'Unnamed');
             labelsHtml += `
               <div class="cal-ev-label label-${ev.orderStatus}">
                 <div class="cal-dot bg-${ev.orderStatus}"></div>
@@ -3860,7 +4248,7 @@
             <div class="cal-evt-top">
               <div class="cal-evt-title">
                 <div class="cal-dot bg-${o.orderStatus}"></div>
-                <span>${esc(o.customerName || 'Unnamed')}</span>
+                <span>${kamraBadge(o)}${esc(o.customerName || 'Unnamed')}</span>
               </div>
             </div>
             <div class="cal-evt-time">
@@ -3909,7 +4297,8 @@
        onclick="toggleExpand('${o.id}')">
     <div class="card-body">
       <div class="card-top">
-        <div class="card-top-left">
+      <div class="card-top-left">
+          ${kamraBadge(o)}
           <span class="badge ${unpaid ? 'badge-unpaid' : 'badge-paid'}">${unpaid ? 'Unpaid' : 'Paid'}</span>
           ${flagged ? '<i class="flag-pip" title="Needs review">!</i>' : ''}
         </div>
@@ -3951,6 +4340,14 @@
           const qty = parseFloat(i.quantity) || 0;
           const price = parseFloat(i.unitPrice) || 0;
           const line = qty * price;
+          if (i.lineType === 'sample') {
+            const list = parseFloat(i.listPrice) || 0;
+            return `<div class="expand-item-row is-sample-row">
+          <span class="ei-name"><span class="item-qty">${qty}×</span> ${esc(i.name)}</span>
+          <span class="ei-qty"><span class="price-was">${list.toFixed(2)}</span> → 0.00</span>
+          <span class="ei-total"><span class="sample-tag">Sample</span></span>
+        </div>`;
+          }
           return `<div class="expand-item-row">
           <span class="ei-name"><span class="item-qty">${qty}×</span> ${esc(i.name)}</span>
           <span class="ei-qty">AED ${price.toFixed(2)} each</span>
@@ -4064,6 +4461,14 @@
           const qty = parseFloat(i.quantity) || 0;
           const price = parseFloat(i.unitPrice) || 0;
           const line = qty * price;
+          if (i.lineType === 'sample') {
+            const list = parseFloat(i.listPrice) || 0;
+            return `<div class="expand-item-row is-sample-row">
+            <span class="ei-name">${esc(i.name)}</span>
+            <span class="ei-qty">${qty} × <span class="price-was">${list.toFixed(2)}</span> → 0.00</span>
+            <span class="ei-total"><span class="sample-tag">Sample</span></span>
+          </div>`;
+          }
           return `<div class="expand-item-row">
             <span class="ei-name">${esc(i.name)}</span>
             <span class="ei-qty">${qty} × AED ${price.toFixed(2)}</span>
@@ -4086,7 +4491,7 @@
       return `
         <div class="expand-section">
           <div class="expand-section-title">Customer</div>
-          <div class="items-summary" style="margin-bottom:8px">${esc(o.customerName || 'Unnamed')}</div>
+          <div class="items-summary" style="margin-bottom:8px">${kamraBadge(o)}${esc(o.customerName || 'Unnamed')}</div>
           <div class="ei-qty">${esc(o.phone || 'No phone')}</div>
           <div class="ei-qty">${esc(o.address || 'No address')}</div>
         </div>
@@ -4134,13 +4539,14 @@
     // ══════════════════════════════════════════════
     //  ORDER FORM MODAL
     // ══════════════════════════════════════════════
-    function openModal(id) {
+    function openModal(id, catalog = 'kaakeh') {
       editId = id || null;
+      orderCatalog = editId ? (orders.find(o => o.id === editId)?.catalog || 'kaakeh') : catalog;
       const oldBanner = document.querySelector('.payment-link-banner');
       if (oldBanner) oldBanner.remove();
       const saveBtn = document.getElementById('btn-save-order');
       if (saveBtn) { saveBtn.disabled = false; saveBtn.classList.remove('btn-success'); saveBtn.innerHTML = 'Save Order'; }
-      document.getElementById('modal-title').textContent = editId ? 'Edit Order' : 'New Order';
+      document.getElementById('modal-title').textContent = (editId ? 'Edit ' : 'New ') + (orderCatalog === 'kamra' ? 'Kamra Order' : 'Kaakeh Order');
       document.getElementById('overlay').classList.add('open');
       if (editId) { const o = orders.find(x => x.id === editId); if (o) fillForm(o); }
       else { resetForm(); document.getElementById('f-date').value = todayStr(); addItemRow(); }
@@ -4160,6 +4566,7 @@
       document.getElementById('f-address').value = o.address || '';
       document.getElementById('f-date').value = o.deliveryDate || '';
       document.getElementById('f-time').value = o.deliveryTime || '';
+      document.getElementById('f-notes').value = o.notes || '';
 
       document.getElementById('items-container').innerHTML = '';
       o.items.forEach(addItemRow);
@@ -4169,18 +4576,31 @@
       const r = document.createElement('div'); r.className = 'item-form-row';
       const skuId = item?.sku_id || findSkuIdByName(item?.name) || '';
       const qty = item?.qty ?? item?.quantity ?? '';
+      const isSample = item?.lineType === 'sample';
       r.innerHTML = `
-    <select class="inp-sku" onchange="refreshTotal()">${buildSkuOptions(skuId)}</select>
+    <select class="inp-sku" onchange="refreshTotal()">${buildSkuOptions(skuId, orderCatalog)}</select>
     <input class="inp-qty"   type="number" placeholder="Qty" min="0.5" step="0.5" value="${qty}" oninput="refreshTotal()">
+    <button class="btn-sample" data-sample="${isSample ? '1' : '0'}" aria-pressed="${isSample}" onclick="toggleSample(this)" title="Give this line free as a sample">Sample</button>
     <button class="rm-item" onclick="this.parentElement.remove();refreshTotal()" title="Remove">✕</button>`;
+      if (isSample) r.classList.add('is-sample');
       c.appendChild(r); refreshTotal();
+    }
+    // The charged price is always derived live from the selected SKU, so a sample
+    // line stays correct when the SKU or quantity changes — nothing is captured here.
+    function toggleSample(btn) {
+      const on = btn.dataset.sample !== '1';
+      btn.dataset.sample = on ? '1' : '0';
+      btn.setAttribute('aria-pressed', String(on));
+      btn.parentElement.classList.toggle('is-sample', on);
+      refreshTotal();
     }
     function refreshTotal() {
       let t = 0;
       document.querySelectorAll('#items-container .item-form-row').forEach(r => {
         const sku = skusById[r.querySelector('.inp-sku').value];
         const qty = parseFloat(r.querySelector('.inp-qty').value) || 0;
-        t += qty * skuUnitPrice(sku);
+        const sample = r.querySelector('.btn-sample')?.dataset.sample === '1';
+        t += sample ? 0 : qty * skuUnitPrice(sku);
       });
 
       document.getElementById('total-preview').textContent = `Order Total: ${t.toFixed(2)}`;
@@ -4189,6 +4609,7 @@
       return Array.from(document.querySelectorAll('#items-container .item-form-row')).map(r => ({
         sku_id: r.querySelector('.inp-sku').value,
         qty: parseFloat(r.querySelector('.inp-qty').value) || 0,
+        line_type: r.querySelector('.btn-sample')?.dataset.sample === '1' ? 'sample' : 'sale',
       })).filter(i => i.sku_id && i.qty > 0);
     }
 
@@ -4206,6 +4627,7 @@
       const data = {
         customerName: name,
         phone: document.getElementById('f-phone').value.trim(),
+        catalog: orderCatalog,
         address: document.getElementById('f-address').value.trim(),
         items,
         deliveryDate: date,
@@ -4408,7 +4830,7 @@
           const t = todayStr();
           if (data.deliveryDate === t) switchTab('today');
           else if (data.deliveryDate > t) switchTab('upcoming');
-          else switchTab('all');
+          else openCalendarDate(data.deliveryDate);
         }, typeof ok === 'string' ? 7000 : 1500);
       } else {
         setBtnState(btn, 'idle');
@@ -4548,7 +4970,7 @@
           const t = todayStr();
           if (data.deliveryDate === t) switchTab('today');
           else if (data.deliveryDate > t) switchTab('upcoming');
-          else switchTab('all');
+          else openCalendarDate(data.deliveryDate);
         }, typeof ok === 'string' ? 7000 : 1500);
       } else {
         setBtnState(btn, 'idle');
@@ -4564,12 +4986,26 @@
       await seedIfEmpty();
       await loadOrders();
       subscribeRealtime();
+      await loadPrepProgress();
+      // Reconcile missed realtime events after sleep or a temporary disconnection.
+      setInterval(() => {
+        if (!document.hidden && ((curTab === 'today' && prepView.today) || (curTab === 'upcoming' && prepView.upcoming))) {
+          loadPrepProgress();
+          loadOrders();
+        }
+      }, 15000);
+      document.addEventListener('visibilitychange', () => {
+        if (!document.hidden) { loadPrepProgress(); loadOrders(); renderHeaderDate(); }
+      });
 
       document.getElementById('fab-items-container').addEventListener('keydown', e => {
         if (e.key === 'Enter' && e.target.classList.contains('inp-qty')) { e.preventDefault(); fabAddItemRow(); }
       });
       document.getElementById('items-container').addEventListener('keydown', e => {
         if (e.key === 'Enter' && e.target.classList.contains('inp-qty')) { e.preventDefault(); addItemRow(); }
+      });
+      document.getElementById('sku-overlay').addEventListener('keydown', e => {
+        if (e.key === 'Enter') { e.preventDefault(); saveSku(); }
       });
     }
 
