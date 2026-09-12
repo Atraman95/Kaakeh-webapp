@@ -205,7 +205,7 @@ serve(async (req) => {
           quantity: 1,
         }],
         mode: "payment",
-        success_url: "https://atraman95.github.io/Kaakeh-webapp/thank-you.html",
+        success_url: `https://kaakeh.ae/thank-you?order=${order.id}`,
         cancel_url: "https://stripe.com",
         metadata: { order_id: order.id, customer_name },
       })
