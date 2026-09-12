@@ -18,6 +18,18 @@ const stripe = new Stripe(Deno.env.get("STRIPE_SECRET_KEY")!, {
 
 const DELIVERY_SKU_ID = "76f384c5-d815-4d14-90ce-ea3dfbaf5bec"
 
+// Short payment code alphabet: no 0/O and no 1/I/L, so a code read aloud or
+// typed from a phone screen is unambiguous. 31^4 = 923,521 combinations.
+const CODE_ALPHABET = "ABCDEFGHJKMNPQRSTUVWXYZ23456789"
+
+function randomCode(): string {
+  const bytes = new Uint8Array(4)
+  crypto.getRandomValues(bytes)
+  let out = ""
+  for (const b of bytes) out += CODE_ALPHABET[b % CODE_ALPHABET.length]
+  return out
+}
+
 serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response("ok", { headers: corsHeaders })
@@ -212,10 +224,28 @@ serve(async (req) => {
       payment_link = session.url
     }
 
-    await supabase
-      .from("orders")
-      .update({ subtotal, grand_total: subtotal, ...(payment_link ? { payment_link } : {}) })
-      .eq("id", order.id)
+    // Allocate the short code by writing it: the unique index on payment_code is
+    // the arbiter, so two sessions created concurrently cannot share a code.
+    // Regenerating overwrites payment_code and payment_link together, which
+    // retires the previous code by design.
+    let payment_code: string | null = null
+    if (payment_link) {
+      for (let attempt = 1; ; attempt++) {
+        const candidate = randomCode()
+        const { error: codeError } = await supabase
+          .from("orders")
+          .update({ subtotal, grand_total: subtotal, payment_link, payment_code: candidate })
+          .eq("id", order.id)
+        if (!codeError) { payment_code = candidate; break }
+        if (codeError.code !== "23505") throw codeError   // not a collision
+        if (attempt >= 5) throw new Error("Could not allocate a unique payment code")
+      }
+    } else {
+      await supabase
+        .from("orders")
+        .update({ subtotal, grand_total: subtotal })
+        .eq("id", order.id)
+    }
 
     return new Response(
       JSON.stringify({
@@ -223,6 +253,7 @@ serve(async (req) => {
         subtotal,
         grand_total: subtotal,
         payment_link,
+        payment_code,
       }),
       {
         headers: { ...corsHeaders, "Content-Type": "application/json" }
