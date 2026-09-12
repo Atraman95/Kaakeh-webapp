@@ -1,7 +1,0 @@
-# Vercel serves this repo root as static files. Only the app itself should be
-# public — everything below is project tooling, docs, or Supabase internals.
-*.md
-.vscode/
-supabase/
-Terminal
-.gitignore
