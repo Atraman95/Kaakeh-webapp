@@ -4,6 +4,9 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Thank You — Kaakeh</title>
+  <meta name="description" content="Your Kaakeh order is confirmed. Thank you for your payment."/>
+  <meta name="robots" content="noindex"/>
+  <link rel="icon" href="/Logo.png"/>
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=Tajawal:wght@300;400;500&display=swap" rel="stylesheet"/>
   <style>
     :root {
@@ -85,7 +88,7 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      animation: pop 0.5s 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+      animation: pop 0.5s 0.1s cubic-bezier(0.34, 1.56, 0.64, 1) both;
     }
 
     @keyframes pop {
@@ -107,7 +110,7 @@
       color: var(--maroon);
       text-transform: uppercase;
       margin-bottom: 0.6rem;
-      animation: fade 0.6s 0.5s both;
+      animation: fade 0.5s 0.18s both;
     }
 
     /* ── Headline ── */
@@ -118,7 +121,7 @@
       color: var(--maroon);
       line-height: 1.2;
       margin-bottom: 1rem;
-      animation: fade 0.6s 0.6s both;
+      animation: fade 0.5s 0.24s both;
     }
 
     .headline em {
@@ -132,7 +135,7 @@
       height: 1.5px;
       background: linear-gradient(90deg, transparent, var(--gold), transparent);
       margin: 1.25rem auto;
-      animation: fade 0.6s 0.7s both;
+      animation: fade 0.5s 0.30s both;
     }
 
     /* ── Body text ── */
@@ -141,7 +144,7 @@
       font-weight: 300;
       color: var(--warm-mid);
       line-height: 1.75;
-      animation: fade 0.6s 0.8s both;
+      animation: fade 0.5s 0.36s both;
     }
 
     .body-text strong {
@@ -157,7 +160,7 @@
       font-size: 0.8rem;
       color: #b0977a;
       letter-spacing: 0.02em;
-      animation: fade 0.6s 1s both;
+      animation: fade 0.5s 0.42s both;
     }
 
     .note a {
@@ -181,7 +184,7 @@
       color: #c4aa88;
       letter-spacing: 0.08em;
       text-transform: uppercase;
-      animation: fade 0.6s 1.1s both;
+      animation: fade 0.5s 0.48s both;
     }
 
     /* ── Decorative corners ── */
@@ -204,6 +207,87 @@
       border-width: 0 2px 2px 0;
     }
 
+    /* ── Order summary ── */
+    .summary {
+      margin-top: 2rem;
+      padding-top: 1.75rem;
+      border-top: 1px solid rgba(201,168,76,0.2);
+      text-align: left;
+      animation: fade 0.45s both;
+    }
+
+    .summary-ref {
+      font-size: 0.72rem;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: #b0977a;
+      text-align: center;
+      margin-bottom: 1.25rem;
+    }
+
+    .summary-ref strong {
+      color: var(--maroon);
+      font-weight: 500;
+      letter-spacing: 0.08em;
+    }
+
+    .sum-row {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      font-size: 0.88rem;
+      font-weight: 300;
+      color: var(--warm-mid);
+      padding: 5px 0;
+    }
+
+    .sum-row .qty { color: var(--dark); font-weight: 500; }
+    .sum-name { flex: 1; min-width: 0; overflow-wrap: anywhere; }
+    .sum-amt { white-space: nowrap; color: var(--dark); font-weight: 400; }
+
+    .sum-sample {
+      display: inline-block;
+      margin-left: 6px;
+      padding: 1px 6px;
+      border-radius: 99px;
+      background: #f0e6cc;
+      color: var(--maroon);
+      font-size: 0.62rem;
+      font-weight: 500;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+
+    .sum-total {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 0.9rem;
+      padding-top: 0.9rem;
+      border-top: 1px solid rgba(201,168,76,0.2);
+      font-size: 0.95rem;
+      font-weight: 500;
+      color: var(--maroon);
+    }
+
+    .sum-when {
+      margin-top: 1rem;
+      font-size: 0.8rem;
+      font-weight: 300;
+      color: #b0977a;
+      text-align: center;
+    }
+
+    .sum-when strong { color: var(--warm-mid); font-weight: 500; }
+
+    /* Respect a reduced-motion preference: reveal everything immediately
+       rather than leaving the card blank behind delayed animations. */
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation: none !important;
+        transition: none !important;
+      }
+    }
+
     @media (max-width: 480px) {
       .card { padding: 2.5rem 1.75rem; }
       .headline { font-size: 1.65rem; }
@@ -215,13 +299,13 @@
   <main class="page">
     <div class="card">
       <div class="check-wrap">
-        <svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <svg viewBox="0 0 32 32" fill="none" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg">
           <circle cx="16" cy="16" r="15" stroke="#c9a84c" stroke-width="1.5"/>
           <path d="M9 16.5L13.5 21L23 11" stroke="#6b1f1f" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
         </svg>
       </div>
 
-      <div class="brand-arabic">كعكة &nbsp;·&nbsp; Kaakeh</div>
+      <div class="brand-arabic"><span lang="ar">كعكة</span> &nbsp;·&nbsp; Kaakeh</div>
 
       <h1 class="headline">Thank you for<br/><em>your order</em></h1>
 
@@ -231,13 +315,77 @@
         Your payment was received successfully.
       </p>
 
+      <div class="summary" id="summary" hidden></div>
+
       <div class="note">
         Questions? Reach us on
-        <a href="https://wa.me/971504680860" target="_blank">WhatsApp</a>
+        <a href="https://wa.me/971504680860" target="_blank" rel="noopener noreferrer">WhatsApp</a>
       </div>
     </div>
 
     <div class="footer">Home-made &nbsp;·&nbsp; Traditional recipes</div>
   </main>
+
+  <script>
+    // The order id is appended to success_url by the create-order function, so
+    // the page can confirm exactly what was purchased. Absent or unknown id
+    // simply leaves the generic confirmation above untouched.
+    (function () {
+      var SUPABASE_URL = 'https://maoyacaiwerynhvhonai.supabase.co';
+      var SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1hb3lhY2Fpd2VyeW5odmhvbmFpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIyMTQ5OTUsImV4cCI6MjA4Nzc5MDk5NX0.7ASxtd68bPh69XIpGQkxnXWy4l1s4h8fbdS9E1-rozk';
+      var id = new URLSearchParams(location.search).get('order');
+      if (!id || !/^[0-9a-fA-F-]{8,40}$/.test(id)) return;
+
+      function esc(s) {
+        return String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;')
+          .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+      }
+      function money(n) { return Number(n || 0).toFixed(2); }
+      function when(d) {
+        if (!d) return '';
+        var p = String(d).split('-');
+        if (p.length !== 3) return d;
+        var dt = new Date(+p[0], +p[1] - 1, +p[2]);
+        if (isNaN(dt)) return d;
+        return dt.toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long' });
+      }
+
+      var url = SUPABASE_URL + '/rest/v1/orders?id=eq.' + encodeURIComponent(id) +
+        '&select=id,delivery_date,delivery_time,grand_total,order_items(product_name,qty,unit_price,line_total,line_type,list_price)';
+
+      fetch(url, { headers: { apikey: SUPABASE_KEY, Authorization: 'Bearer ' + SUPABASE_KEY } })
+        .then(function (r) { return r.ok ? r.json() : []; })
+        .then(function (rows) {
+          var o = rows && rows[0];
+          if (!o) return;
+          var items = o.order_items || [];
+          var lines = items.map(function (i) {
+            var sample = i.line_type === 'sample';
+            var amt = sample
+              ? '<span class="sum-sample">Sample</span>'
+              : 'AED ' + money(i.line_total != null ? i.line_total : (i.unit_price || 0) * (i.qty || 0));
+            return '<div class="sum-row"><span class="sum-name"><span class="qty">' +
+              esc(Number(i.qty)) + '×</span> ' + esc(i.product_name) + '</span>' +
+              '<span class="sum-amt">' + amt + '</span></div>';
+          }).join('');
+
+          var total = o.grand_total != null ? o.grand_total : items.reduce(function (s, i) {
+            return s + Number(i.line_total || 0);
+          }, 0);
+
+          var html = '<div class="summary-ref">Order <strong>' +
+            esc(String(o.id).slice(0, 8).toUpperCase()) + '</strong></div>' + lines +
+            '<div class="sum-total"><span>Total</span><span>AED ' + money(total) + '</span></div>';
+          if (o.delivery_date) {
+            html += '<div class="sum-when">Delivery <strong>' + esc(when(o.delivery_date)) +
+              (o.delivery_time ? ' · ' + esc(o.delivery_time) : '') + '</strong></div>';
+          }
+          var el = document.getElementById('summary');
+          el.innerHTML = html;
+          el.hidden = false;
+        })
+        .catch(function () { /* keep the generic confirmation */ });
+    })();
+  </script>
 </body>
 </html>
