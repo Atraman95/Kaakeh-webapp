@@ -32,6 +32,20 @@ serve(async (req) => {
       .eq("id", order_id)
 
     if (error) return new Response("DB update failed", { status: 500 }) // triggers Stripe retry
+
+    // Payment advances New -> Confirmed. "Confirmed" is the stepper label for
+    // the stored value "in-progress"; there is no separate status.
+    //
+    // Scoped to order_status = "new" on purpose: a webhook that arrives late,
+    // or a Stripe retry, must never drag an order the kitchen has already moved
+    // to Ready or Delivered back down the stepper.
+    const { error: statusError } = await supabase
+      .from("orders")
+      .update({ order_status: "in-progress" })
+      .eq("id", order_id)
+      .eq("order_status", "new")
+
+    if (statusError) return new Response("DB update failed", { status: 500 })
   }
 
   return new Response(JSON.stringify({ received: true }), {
