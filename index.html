@@ -2387,6 +2387,25 @@
       background: #e2e8f0;
     }
 
+    /* Card-sized WhatsApp send, to sit beside .plink-copy-btn-sm */
+    .wa-send-btn-sm {
+      padding: 3px 9px;
+      font-size: .72rem;
+      font-weight: 600;
+      border-radius: 5px;
+      gap: 5px;
+    }
+
+    .wa-send-btn-sm svg {
+      width: 13px;
+      height: 13px;
+    }
+
+    .wa-missing-note {
+      font-size: .72rem;
+      color: var(--text-muted);
+    }
+
     /* ─── CALENDAR VIEW PORTED STYLES ─── */
     .cal-header {
       display: flex;
@@ -3372,6 +3391,25 @@
         `Total: AED ${total.toFixed(2)}`,
         link          ? `Payment: ${link}`          : null,
       ].filter(l => l !== null).join('\n');
+    }
+
+    // The post-save banner only lives for a few seconds, so every order also
+    // carries its own send row — reachable any time the order is open.
+    function sendRowHTML(o) {
+      const href = waLink(o.phone, buildOrderSummary(o));
+      const send = href
+        ? `<a class="wa-send-btn wa-send-btn-sm" href="${esc(href)}" target="_blank" rel="noopener"
+              onclick="event.stopPropagation()">${WA_GLYPH}<span>Send on WhatsApp</span></a>`
+        // The card shows the phone right above this, so name what's wrong with it.
+        : `<span class="wa-missing-note">${String(o.phone || '').trim()
+            ? 'Check phone number to send' : 'No phone number'}</span>`;
+      return `<div class="plink-row">
+      ${send}
+      <button class="plink-copy-btn-sm"
+              onclick="event.stopPropagation();copyCardSummary('${esc(o.id)}',this)">
+        Copy Order Summary
+      </button>
+    </div>`;
     }
 
     function copyCardSummary(id, btn) {
@@ -4546,13 +4584,7 @@
     <div class="expand-section">
       <div class="expand-section-title">Payment</div>
       ${payHtml}
-      ${o.paymentLink ? `
-        <div class="plink-row">
-          <button class="plink-copy-btn-sm"
-                  onclick="event.stopPropagation();copyCardSummary('${esc(o.id)}',this)">
-            Copy Order Summary
-          </button>
-        </div>` : ''}
+      ${sendRowHTML(o)}
     </div>
     <div class="expand-section">
       <div class="expand-section-title">Notes</div>
@@ -4638,10 +4670,10 @@
             <span><span class="curr">AED</span>${total.toFixed(0)}</span>
           </div>
         </div>
-        ${o.paymentLink ? `<div class="expand-section">
-          <div class="expand-section-title">Payment Link</div>
-          <button class="plink-copy-btn-sm" onclick='copyCardSummary(${JSON.stringify(o.id)},this)'>Copy Order Summary</button>
-        </div>` : ''}
+        <div class="expand-section">
+          <div class="expand-section-title">Send to Customer</div>
+          ${sendRowHTML(o)}
+        </div>
         ${rawHtml}
       `;
     }
