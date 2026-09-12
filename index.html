@@ -3277,8 +3277,14 @@
       }
     }
 
+    // Branded short link served by pay.kaakeh.ae, which 302s to payment_link.
+    // Orders created before payment codes existed have none and keep using the
+    // full Stripe URL.
+    const PAY_SHORT_BASE = 'https://pay.kaakeh.ae';
+    function shortPayLink(code) { return code ? PAY_SHORT_BASE + '/' + code : ''; }
+
     function buildOrderSummary(order, url) {
-      const link = url || order.paymentLink || '';
+      const link = url || shortPayLink(order.paymentCode) || order.paymentLink || '';
       const lines = (order.items || []).map(i => {
         let name, qty, unit;
         if (i.sku_id && !i.name) {
@@ -3372,6 +3378,7 @@
         statedTotal: row.stated_total ? parseFloat(row.stated_total) : null,
         rawMessageText: row.raw_message_text || '',
         paymentLink: row.payment_link || null,
+        paymentCode: row.payment_code || null,
         notes: row.notes || '',
         items: itemRows.map(i => ({
           name: i.product_name || i.name || '',
@@ -3595,7 +3602,7 @@
           _notesMap[savedId] = note;
         }
 
-        return body.payment_link || true;
+        return shortPayLink(body.payment_code) || body.payment_link || true;
       } catch (err) {
         alert('Save failed: ' + (err?.message || String(err)));
         return false;
@@ -3629,7 +3636,8 @@
       btn.innerHTML = '↻ Regenerating…';
       const items = o.items
         .filter(i => i.sku_id)
-        .map(i => ({ sku_id: i.sku_id, qty: parseFloat(i.quantity) || 0 }))
+        // line_type must survive this rebuild or regeneration reprices a sample as a sale.
+        .map(i => ({ sku_id: i.sku_id, qty: parseFloat(i.quantity) || 0, line_type: i.lineType === 'sample' ? 'sample' : 'sale' }))
         .filter(i => i.qty > 0);
       try {
         const res = await fetch(`${SUPABASE_URL}/functions/v1/create-order`, {
@@ -3650,7 +3658,7 @@
         });
         const body = await res.json().catch(() => ({}));
         if (!res.ok) { alert('Failed: ' + (body.error || `HTTP ${res.status}`)); btn.disabled = false; btn.innerHTML = origHtml; return; }
-        if (body.payment_link) { o.paymentLink = body.payment_link; render(); }
+        if (body.payment_link) { o.paymentLink = body.payment_link; o.paymentCode = body.payment_code || null; render(); }
         btn.innerHTML = '✓ Done';
         setTimeout(() => { btn.disabled = false; btn.innerHTML = origHtml; }, 2000);
       } catch (err) {
